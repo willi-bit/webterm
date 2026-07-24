@@ -1,0 +1,26 @@
+---
+import { profile } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Contact">
+  <header class="page-heading">
+    <p>mail --compose</p>
+    <h1>Contact</h1>
+    <p>The static prototype uses direct contact links and collects no visitor data.</p>
+  </header>
+
+  <p>
+    Email: <a href={`mailto:${profile.email}`}>{profile.email}</a>
+  </p>
+
+  <ul>
+    {
+      profile.socials.map((link) => (
+        <li>
+          <a href={link.href} rel="me">{link.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

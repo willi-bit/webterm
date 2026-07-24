@@ -1,0 +1,30 @@
+---
+import { experience } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Experience">
+  <header class="page-heading">
+    <p>cat experience.md</p>
+    <h1>Experience</h1>
+    <p>Selected roles, responsibilities, and outcomes.</p>
+  </header>
+
+  <ol class="content-list">
+    {
+      experience.map((item) => (
+        <li class="card">
+          <article>
+            <p>{item.period}</p>
+            <h2>{item.role}</h2>
+            <p>{item.company}</p>
+            <p>{item.summary}</p>
+            <ul>
+              {item.highlights.map((highlight) => <li>{highlight}</li>)}
+            </ul>
+          </article>
+        </li>
+      ))
+    }
+  </ol>
+</BaseLayout>

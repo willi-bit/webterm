@@ -1,0 +1,61 @@
+---
+import { navigation, profile } from "../data/site";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = profile.introduction,
+} = Astro.props;
+
+const documentTitle = title ? `${title} | ${profile.name}` : `${profile.name} | ${profile.role}`;
+const currentPath = Astro.url.pathname;
+const isCurrentRoute = (href: string) =>
+  href === "/" ? currentPath === href : currentPath.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{documentTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <a class="site-identity" href="/">{profile.name}</a>
+      <nav aria-label="Primary navigation">
+        <ul class="site-navigation">
+          {
+            navigation.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={isCurrentRoute(item.href) ? "page" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content" class="site-main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p>Built with Astro and React. Prepared for Cloudflare Workers.</p>
+    </footer>
+  </body>
+</html>

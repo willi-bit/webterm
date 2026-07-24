@@ -1,0 +1,31 @@
+---
+import { profile, skillGroups } from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="About">
+  <header class="page-heading">
+    <p>whoami</p>
+    <h1>About</h1>
+    <p>{profile.introduction}</p>
+  </header>
+
+  <section aria-labelledby="background-heading">
+    <h2 id="background-heading">Background</h2>
+    {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+  </section>
+
+  <section aria-labelledby="skills-heading">
+    <h2 id="skills-heading">Skills</h2>
+    <ul class="card-list">
+      {
+        skillGroups.map((group) => (
+          <li class="card">
+            <h3>{group.title}</h3>
+            <p>{group.items.join(" · ")}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

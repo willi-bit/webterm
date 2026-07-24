@@ -1,0 +1,54 @@
+---
+import {
+  experience,
+  profile,
+  skillGroups,
+} from "../data/site";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="CV">
+  <header class="page-heading">
+    <p>open cv.pdf</p>
+    <h1>{profile.name}</h1>
+    <p>{profile.role} · {profile.location}</p>
+    <p>
+      <a href={`mailto:${profile.email}`}>{profile.email}</a>
+    </p>
+  </header>
+
+  <section aria-labelledby="cv-profile-heading">
+    <h2 id="cv-profile-heading">Profile</h2>
+    <p>{profile.introduction}</p>
+  </section>
+
+  <section aria-labelledby="cv-experience-heading">
+    <h2 id="cv-experience-heading">Experience</h2>
+    {
+      experience.map((item) => (
+        <article>
+          <h3>{item.role} — {item.company}</h3>
+          <p>{item.period}</p>
+          <p>{item.summary}</p>
+          <ul>
+            {item.highlights.map((highlight) => <li>{highlight}</li>)}
+          </ul>
+        </article>
+      ))
+    }
+  </section>
+
+  <section aria-labelledby="cv-skills-heading">
+    <h2 id="cv-skills-heading">Skills</h2>
+    {
+      skillGroups.map((group) => (
+        <p><strong>{group.title}:</strong> {group.items.join(", ")}</p>
+      ))
+    }
+  </section>
+
+  <p>
+    Add a PDF to <code>public/cv.pdf</code>, then add a download link here when the
+    final CV is available.
+  </p>
+</BaseLayout>
