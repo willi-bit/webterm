@@ -12,7 +12,7 @@ src/lib/terminal.ts              Framework-independent command engine
 src/components/Terminal.tsx      Interactive React terminal
 src/pages/                       Conventional, indexable portfolio routes
 src/layouts/BaseLayout.astro     Shared document shell and navigation
-src/styles/global.css            Minimal structural styling
+src/styles/global.css            Rosé Pine Moon design system
 wrangler.jsonc                   Cloudflare static-assets deployment
 ```
 
@@ -88,11 +88,13 @@ npx astro add cloudflare
 
 Do not add it solely for the current static site.
 
-## Styling handoff
+## Styling
 
-Styling is intentionally minimal. The next visual pass can safely work through
-`src/styles/global.css` and component class names without changing the command
-engine or content model. Preserve:
+The visual theme is [Rosé Pine Moon](https://rosepinetheme.com/palette), defined
+as CSS custom properties at the top of `src/styles/global.css`. The pages use a
+quiet, conventional layout while the terminal is styled as a distinct Rosé Pine
+window. Adjust the palette, fonts, and spacing there without changing the
+command engine or content model. Preserve:
 
 - visible keyboard focus
 - the skip link and semantic navigation

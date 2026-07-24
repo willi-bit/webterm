@@ -25,13 +25,22 @@ const isCurrentRoute = (href: string) =>
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#232136" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <title>{documentTitle}</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     <header class="site-header">
-      <a class="site-identity" href="/">{profile.name}</a>
+      <a class="site-identity" href="/">
+        <img src="/icons/favicon-32.png" width="32" height="32" alt="" />
+        <span>{profile.name}</span>
+      </a>
       <nav aria-label="Primary navigation">
         <ul class="site-navigation">
           {

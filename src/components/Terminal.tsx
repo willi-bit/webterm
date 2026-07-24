@@ -118,11 +118,33 @@ export default function Terminal() {
     }
   }
 
+  function focusInput() {
+    if (window.getSelection()?.isCollapsed) {
+      inputRef.current?.focus();
+    }
+  }
+
   return (
-    <section className="terminal" aria-label="Interactive portfolio terminal">
+    <section
+      className="terminal"
+      aria-label="Interactive portfolio terminal"
+      onClick={focusInput}
+    >
       <header className="terminal__header">
-        <p>visitor@portfolio:~</p>
-        <button type="button" onClick={() => setEntries([])}>
+        <div className="terminal__controls" aria-hidden="true">
+          <span className="terminal__dot terminal__dot--love" />
+          <span className="terminal__dot terminal__dot--gold" />
+          <span className="terminal__dot terminal__dot--foam" />
+        </div>
+        <div className="terminal__title">
+          <img src="/icons/favicon-32.png" width="24" height="24" alt="" />
+          <p>visitor@portfolio:~</p>
+        </div>
+        <button
+          type="button"
+          className="terminal__clear"
+          onClick={() => setEntries([])}
+        >
           Clear
         </button>
       </header>
