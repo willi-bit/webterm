@@ -24,12 +24,14 @@ independent versions of the portfolio.
 
 How the pieces interact:
 
+- The home page is bare: no navbar, no hero, just the terminal filling the
+  viewport (`BaseLayout.astro` renders it with `bare`). Subpages keep the
+  conventional header for orientation and no-JS access.
 - On load the terminal types a boot sequence (`whoami`, `cat intro.txt`,
   `help`) so first-time visitors never see an empty box. Reduced-motion
   visitors get the same output instantly.
-- Navigation links carry `data-command` attributes. When the terminal is on
-  the page, clicks are intercepted and run as terminal commands instead of
-  routing; everywhere else they behave as normal links.
+- One-tap command chips under the input (`about`, `projects`, `cv`,
+  `contact`, `help`) cover visitors who don't want to type.
 - `/?run=<command>` deep-links replay a command after boot.
 - Commands return typed output from the engine: plain text lines with
   semantic tones, or rich kinds (`projects`, `experience`, `contact`, `cv`,
@@ -37,7 +39,7 @@ How the pieces interact:
   contact form (mailto compose), a CV preview with download, and a
   color-coded file listing.
 - The window chrome works: red minimizes to a dock button, amber collapses to
-  the input line, green maximizes to the viewport (Escape restores).
+  the input line, green maximizes edge-to-edge (Escape restores).
 
 ## Local development
 

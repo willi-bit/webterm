@@ -5,11 +5,14 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Bare pages render no site header — the content is the whole experience. */
+  bare?: boolean;
 }
 
 const {
   title,
   description = profile.introduction,
+  bare = false,
 } = Astro.props;
 
 const documentTitle = title ? `${title} | ${profile.name}` : `${profile.name} | ${profile.role}`;
@@ -36,53 +39,33 @@ const isCurrentRoute = (href: string) =>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <header class="site-header">
-      <a class="site-identity" href="/">
-        <img src="/icons/favicon-32.png" width="32" height="32" alt="" />
-        <span>{profile.name}</span>
-      </a>
-      <nav aria-label="Primary navigation">
-        <ul class="site-navigation">
-          {
-            navigation.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  aria-current={isCurrentRoute(item.href) ? "page" : undefined}
-                  {...("command" in item ? { "data-command": item.command } : {})}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </header>
+    {
+      !bare && (
+        <header class="site-header">
+          <a class="site-identity" href="/">
+            <img src="/icons/favicon-32.png" width="32" height="32" alt="" />
+            <span>{profile.name}</span>
+          </a>
+          <nav aria-label="Primary navigation">
+            <ul class="site-navigation">
+              {navigation.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    aria-current={isCurrentRoute(item.href) ? "page" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </header>
+      )
+    }
 
-    <main id="main-content" class="site-main">
+    <main id="main-content" class:list={["site-main", { "site-main--bare": bare }]}>
       <slot />
     </main>
-
-
-    <script is:inline>
-      // When the terminal is on the page, navigation links with a matching
-      // command stop being routes: they run the command in the terminal and
-      // let it scroll itself into view. Everywhere else the links keep their
-      // normal behaviour, so the site still works without JavaScript.
-      document.addEventListener("click", (event) => {
-        if (!(event.target instanceof Element)) {
-          return;
-        }
-        const link = event.target.closest("a[data-command]");
-        if (!link || !document.querySelector("[data-terminal]")) {
-          return;
-        }
-        event.preventDefault();
-        window.dispatchEvent(
-          new CustomEvent("webterm:run", { detail: link.dataset.command }),
-        );
-      });
-    </script>
   </body>
 </html>

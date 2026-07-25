@@ -194,30 +194,10 @@ code {
   padding-block: 3.5rem;
 }
 
-.site-footer {
-  padding-block: 2rem;
-  font-size: 0.875rem;
-  color: var(--text-faint);
-  border-top: var(--border-subtle);
-}
-
-/* ------------------------------------------------------------------
-   Home hero — a single human line above the machine
------------------------------------------------------------------- */
-.hero {
-  margin-bottom: 1.75rem;
-}
-
-.hero h1 {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: clamp(1.45rem, 3vw + 0.7rem, 2.1rem);
-  font-weight: 700;
-}
-
-.hero__role {
-  font-weight: 500;
-  color: var(--text-muted);
+/* Bare pages (home): no header, the terminal is the whole viewport */
+.site-main--bare {
+  min-height: 0;
+  padding-block: 1rem;
 }
 
 /* ------------------------------------------------------------------
@@ -309,7 +289,8 @@ code {
 .terminal {
   display: flex;
   flex-direction: column;
-  margin-block: 0 2.5rem;
+  height: calc(100dvh - 2rem);
+  margin-block: 0;
   overflow: hidden;
   font-family: var(--font-mono);
   font-size: 0.9rem;
@@ -333,14 +314,10 @@ code {
   position: fixed;
   inset: 0;
   z-index: 60;
+  height: auto; /* top/bottom: 0 do the sizing here */
   margin: 0;
   border: 0;
   border-radius: 0;
-}
-
-.terminal--maximized .terminal__body {
-  flex: 1;
-  max-height: none;
 }
 
 .terminal__header {
@@ -433,8 +410,8 @@ code {
 }
 
 .terminal__body {
-  min-height: 22rem;
-  max-height: 60vh;
+  flex: 1;
+  min-height: 0;
   padding: 1.1rem 1.25rem;
   overflow-y: auto;
   scrollbar-width: thin;
