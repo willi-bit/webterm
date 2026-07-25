@@ -178,24 +178,6 @@ export default function Terminal() {
     return () => controller.abort();
   }, [appendEntry, runCommand]);
 
-  // The top navigation dispatches "webterm:run" events instead of routing
-  // when the terminal is on the page.
-  useEffect(() => {
-    function onRun(event: Event) {
-      const command = (event as CustomEvent<string>).detail;
-      if (typeof command !== "string") {
-        return;
-      }
-      setMode((current) => (current === "minimized" ? "normal" : current));
-      sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      runCommand(command);
-      inputRef.current?.focus({ preventScroll: true });
-    }
-
-    window.addEventListener("webterm:run", onRun);
-    return () => window.removeEventListener("webterm:run", onRun);
-  }, [runCommand]);
-
   // Keep the log pinned to the newest entry.
   useEffect(() => {
     logRef.current?.scrollTo({
@@ -318,7 +300,6 @@ export default function Terminal() {
       ref={sectionRef}
       className={windowClass}
       aria-label="Interactive portfolio terminal"
-      data-terminal
       onClick={focusInput}
     >
       <header className="terminal__header">

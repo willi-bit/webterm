@@ -1,23 +1,27 @@
 ---
 import Terminal from "../components/Terminal";
-import { profile } from "../data/site";
+import { navigation } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout>
-  <section class="hero">
-    <h1>
-      {profile.name}
-      <span class="hero__role">{" — "}{profile.role}</span>
-    </h1>
-  </section>
-
+<BaseLayout bare>
   <Terminal client:load />
 
   <noscript>
     <p>
-      The interactive terminal requires JavaScript. The complete portfolio remains
-      available from the navigation above.
+      The interactive terminal requires JavaScript. The portfolio is also
+      available as plain pages:
     </p>
+    <ul>
+      {
+        navigation
+          .filter((item) => item.href !== "/")
+          .map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+      }
+    </ul>
   </noscript>
 </BaseLayout>
