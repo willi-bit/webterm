@@ -95,9 +95,9 @@ export const projects: Project[] = [
 
 export const navigation = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about/" },
-  { label: "Experience", href: "/experience/" },
-  { label: "Projects", href: "/projects/" },
-  { label: "CV", href: "/cv/" },
-  { label: "Contact", href: "/contact/" },
+  { label: "About", href: "/about/", command: "about" },
+  { label: "Experience", href: "/experience/", command: "experience" },
+  { label: "Projects", href: "/projects/", command: "projects" },
+  { label: "CV", href: "/cv/", command: "cv" },
+  { label: "Contact", href: "/contact/", command: "contact" },
 ] as const;
