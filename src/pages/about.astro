@@ -1,18 +1,41 @@
 ---
-import { profile, skillGroups } from "../data/site";
+import { education, profile, skillGroups } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="About">
-  <header class="page-heading">
-    <p>whoami</p>
-    <h1>About</h1>
-    <p>{profile.introduction}</p>
-  </header>
+  <div class="profile-heading">
+    <img
+      class="profile-photo"
+      src="/images/willi-bittorf.jpg"
+      width="300"
+      height="300"
+      alt="Portrait of Willi Bittorf"
+    />
+    <header class="page-heading">
+      <p>whoami</p>
+      <h1>About</h1>
+      <p>{profile.introduction}</p>
+    </header>
+  </div>
 
   <section aria-labelledby="background-heading">
     <h2 id="background-heading">Background</h2>
     {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+  </section>
+
+  <section aria-labelledby="education-heading">
+    <h2 id="education-heading">Education</h2>
+    {
+      education.map((item) => (
+        <article class="card">
+          <p>{item.period} · {item.location}</p>
+          <h3>{item.degree}</h3>
+          <p>{item.institution}</p>
+          <p><strong>Selected coursework:</strong> {item.details.join(" · ")}</p>
+        </article>
+      ))
+    }
   </section>
 
   <section aria-labelledby="skills-heading">
@@ -24,6 +47,17 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <h3>{group.title}</h3>
             <p>{group.items.join(" · ")}</p>
           </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="languages-heading">
+    <h2 id="languages-heading">Languages</h2>
+    <ul>
+      {
+        profile.languages.map((item) => (
+          <li><strong>{item.language}:</strong> {item.proficiency}</li>
         ))
       }
     </ul>

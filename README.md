@@ -66,19 +66,18 @@ npm run validate
 This runs Astro's type/content checks, terminal-engine tests, and a production
 build.
 
-## Customize the content
+## Portfolio content
 
-Start with `src/data/site.ts`. Replace:
+The shared content in `src/data/site.ts` contains:
 
-- `Your Name`, role, location, introduction, and biography
-- placeholder email and social links
+- identity, location, introduction, biography, contact details, and social links
+- education, selected coursework, and languages
 - experience entries
 - projects and their links
 - skill groups
 
-Project detail routes and terminal output are generated from the same project
-records. Add a final PDF as `public/cv.pdf` and link it from `src/pages/cv.astro`
-when it exists.
+Project detail routes and terminal output are generated from those same
+records. The English CV is available at `public/cv.pdf`.
 
 ## Cloudflare
 

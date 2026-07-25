@@ -208,6 +208,51 @@ code {
   margin-bottom: 3rem;
 }
 
+.profile-heading {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 3rem);
+  margin-bottom: 3rem;
+}
+
+.profile-heading .page-heading {
+  margin-bottom: 0;
+}
+
+.profile-photo {
+  flex: none;
+  width: clamp(8rem, 22vw, 12rem);
+  height: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  box-shadow: 0 0 2rem -0.75rem rgb(80 250 123 / 35%);
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.button-link {
+  display: inline-block;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bg);
+  text-decoration: none;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.button-link--secondary {
+  color: var(--accent);
+  background: transparent;
+}
+
 /* The small command-style label above each page title */
 .page-heading > p:first-child {
   margin: 0 0 0.5rem;
@@ -281,6 +326,13 @@ code {
   background: var(--bg-inset);
   border: var(--border-subtle);
   border-radius: 999px;
+}
+
+@media (max-width: 36rem) {
+  .profile-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 /* ------------------------------------------------------------------
