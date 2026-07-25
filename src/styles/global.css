@@ -1,23 +1,23 @@
 /* ------------------------------------------------------------------
-   Rosé Pine Moon design system
-   Palette: https://rosepinetheme.com/palette (moon variant)
+   Webterm design system
+   Near-black canvas, one green accent, semantic colors for output.
 ------------------------------------------------------------------ */
 :root {
-  --rp-base: #232136;
-  --rp-surface: #2a273f;
-  --rp-overlay: #393552;
-  --rp-muted: #6e6a86;
-  --rp-subtle: #908caa;
-  --rp-text: #e0def4;
-  --rp-love: #eb6f92;
-  --rp-gold: #f6c177;
-  --rp-rose: #ea9a97;
-  --rp-pine: #3e8fb0;
-  --rp-foam: #9ccfd8;
-  --rp-iris: #c4a7e7;
-  --rp-highlight-low: #2a283e;
-  --rp-highlight-med: #44415a;
-  --rp-highlight-high: #56526e;
+  --bg: #0a0a12;
+  --bg-raised: #10101c;
+  --bg-inset: #0d0d17;
+  --border: #232338;
+  --border-strong: #34344f;
+
+  --text: #e9e9f2;
+  --text-muted: #a0a0b8;
+  --text-faint: #5f5f78;
+
+  --accent: #50fa7b;
+  --accent-soft: rgb(80 250 123 / 12%);
+  --blue: #6cb6ff;
+  --amber: #ffb86c;
+  --red: #ff6b6b;
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
@@ -26,8 +26,8 @@
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
     SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-  --radius: 0.75rem;
-  --border-subtle: 1px solid rgb(57 53 82 / 65%);
+  --radius: 0.4rem;
+  --border-subtle: 1px solid var(--border);
 
   color-scheme: dark;
 }
@@ -40,10 +40,10 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   line-height: 1.6;
-  color: var(--rp-text);
+  color: var(--text);
   background:
-    radial-gradient(55rem 22rem at 50% -10rem, rgb(196 167 231 / 7%), transparent 70%),
-    var(--rp-base);
+    radial-gradient(55rem 22rem at 50% -10rem, rgb(80 250 123 / 5%), transparent 70%),
+    var(--bg);
 }
 
 h1,
@@ -67,27 +67,26 @@ p {
 }
 
 ::selection {
-  color: var(--rp-text);
-  background: var(--rp-highlight-high);
+  color: var(--bg);
+  background: var(--accent);
 }
 
 a {
-  color: var(--rp-foam);
+  color: var(--accent);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.22em;
-  text-decoration-color: rgb(156 207 216 / 35%);
+  text-decoration-color: rgb(80 250 123 / 35%);
   transition:
     color 140ms ease,
     text-decoration-color 140ms ease;
 }
 
 a:hover {
-  color: var(--rp-foam);
-  text-decoration-color: var(--rp-foam);
+  text-decoration-color: var(--accent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--rp-foam);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 0.25rem;
 }
@@ -96,9 +95,10 @@ code {
   padding: 0.12em 0.4em;
   font-family: var(--font-mono);
   font-size: 0.9em;
-  color: var(--rp-rose);
-  background: var(--rp-highlight-med);
-  border-radius: 0.35rem;
+  color: var(--amber);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 0.3rem;
 }
 
 /* ------------------------------------------------------------------
@@ -106,14 +106,14 @@ code {
 ------------------------------------------------------------------ */
 .skip-link {
   position: absolute;
-  z-index: 20;
+  z-index: 80;
   left: 1rem;
   top: -5rem;
   padding: 0.5rem 0.9rem;
-  color: var(--rp-text);
-  background: var(--rp-surface);
-  border: 1px solid var(--rp-overlay);
-  border-radius: 0.5rem;
+  color: var(--text);
+  background: var(--bg-raised);
+  border: var(--border-subtle);
+  border-radius: var(--radius);
   transition: top 140ms ease;
 }
 
@@ -131,13 +131,13 @@ code {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
   padding-block: 0.9rem;
-  background: rgb(35 33 54 / 85%);
+  background: rgb(10 10 18 / 85%);
   border-bottom: var(--border-subtle);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -149,13 +149,13 @@ code {
   gap: 0.65rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--rp-text);
+  color: var(--text);
   text-decoration: none;
 }
 
 .site-identity img {
   border-radius: 0.4rem;
-  filter: drop-shadow(0 0 0.5rem rgb(196 167 231 / 40%));
+  filter: drop-shadow(0 0 0.5rem rgb(80 250 123 / 35%));
 }
 
 .site-navigation {
@@ -170,23 +170,23 @@ code {
 .site-navigation a {
   display: inline-block;
   padding: 0.35rem 0.75rem;
-  color: var(--rp-subtle);
+  color: var(--text-muted);
   text-decoration: none;
-  border-radius: 0.5rem;
+  border-radius: var(--radius);
   transition:
     color 140ms ease,
     background-color 140ms ease;
 }
 
 .site-navigation a:hover {
-  color: var(--rp-text);
-  background: var(--rp-highlight-med);
+  color: var(--text);
+  background: var(--bg-raised);
 }
 
 .site-navigation [aria-current="page"] {
-  color: var(--rp-text);
-  background: var(--rp-highlight-low);
-  box-shadow: inset 0 -2px 0 var(--rp-love);
+  color: var(--text);
+  background: var(--bg-raised);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .site-main {
@@ -197,12 +197,31 @@ code {
 .site-footer {
   padding-block: 2rem;
   font-size: 0.875rem;
-  color: var(--rp-muted);
+  color: var(--text-faint);
   border-top: var(--border-subtle);
 }
 
 /* ------------------------------------------------------------------
-   Content blocks
+   Home hero — a single human line above the machine
+------------------------------------------------------------------ */
+.hero {
+  margin-bottom: 1.75rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.45rem, 3vw + 0.7rem, 2.1rem);
+  font-weight: 700;
+}
+
+.hero__role {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ------------------------------------------------------------------
+   Content blocks (subpages)
 ------------------------------------------------------------------ */
 .page-heading {
   max-width: 48rem;
@@ -215,25 +234,20 @@ code {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: 0.03em;
-  color: var(--rp-pine);
+  color: var(--accent);
 }
 
 .page-heading > p:first-child::before {
   content: "$ ";
-  color: var(--rp-muted);
+  color: var(--text-faint);
 }
 
 .page-heading h1 {
   margin: 0 0 0.9rem;
-  background: linear-gradient(115deg, var(--rp-text) 35%, var(--rp-iris));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
 }
 
 .page-heading > p:not(:first-child) {
-  color: var(--rp-subtle);
+  color: var(--text-muted);
 }
 
 .content-list,
@@ -246,8 +260,8 @@ code {
 
 .card {
   padding: 1.5rem;
-  background: var(--rp-surface);
-  border: 1px solid var(--rp-overlay);
+  background: var(--bg-raised);
+  border: var(--border-subtle);
   border-radius: var(--radius);
   transition:
     transform 160ms ease,
@@ -256,8 +270,8 @@ code {
 }
 
 .card:hover {
-  border-color: var(--rp-highlight-high);
-  box-shadow: 0 14px 34px -16px rgb(0 0 0 / 50%);
+  border-color: var(--border-strong);
+  box-shadow: 0 14px 34px -16px rgb(0 0 0 / 60%);
   transform: translateY(-2px);
 }
 
@@ -283,43 +297,60 @@ code {
   padding: 0.2rem 0.7rem;
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--rp-subtle);
-  background: var(--rp-highlight-med);
-  border: 1px solid var(--rp-overlay);
+  color: var(--text-muted);
+  background: var(--bg-inset);
+  border: var(--border-subtle);
   border-radius: 999px;
 }
 
 /* ------------------------------------------------------------------
-   Terminal — a Rosé Pine Moon window that stands apart from the page
+   Terminal — the app, not a widget
 ------------------------------------------------------------------ */
 .terminal {
-  margin-block: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  margin-block: 0 2.5rem;
   overflow: hidden;
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.55;
-  color: var(--rp-text);
+  color: var(--text);
   cursor: text;
-  background: var(--rp-base);
-  border: 1px solid var(--rp-overlay);
-  border-radius: 0.85rem;
+  background: var(--bg-inset);
+  border: var(--border-subtle);
+  border-radius: 0.6rem;
   box-shadow:
-    0 28px 60px -24px rgb(0 0 0 / 60%),
-    0 0 90px -30px rgb(196 167 231 / 22%);
+    0 30px 70px -28px rgb(0 0 0 / 80%),
+    0 0 80px -40px rgb(80 250 123 / 25%);
   transition: border-color 160ms ease;
 }
 
 .terminal:focus-within {
-  border-color: var(--rp-highlight-high);
+  border-color: var(--border-strong);
+}
+
+.terminal--maximized {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.terminal--maximized .terminal__body {
+  flex: 1;
+  max-height: none;
 }
 
 .terminal__header {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 1rem;
   padding: 0.65rem 1rem;
-  background: var(--rp-surface);
-  border-bottom: 1px solid var(--rp-overlay);
+  background: var(--bg-raised);
+  border-bottom: var(--border-subtle);
 }
 
 .terminal__controls {
@@ -329,21 +360,31 @@ code {
 }
 
 .terminal__dot {
+  position: relative;
   width: 0.75rem;
   height: 0.75rem;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  border: 0;
   border-radius: 50%;
+  transition: filter 140ms ease;
 }
 
-.terminal__dot--love {
-  background: var(--rp-love);
+.terminal__dot:hover {
+  filter: brightness(1.2);
 }
 
-.terminal__dot--gold {
-  background: var(--rp-gold);
+.terminal__dot--close {
+  background: #ff5f56;
 }
 
-.terminal__dot--foam {
-  background: var(--rp-foam);
+.terminal__dot--collapse {
+  background: #ffbd2e;
+}
+
+.terminal__dot--maximize {
+  background: #27c93f;
 }
 
 .terminal__title {
@@ -352,7 +393,7 @@ code {
   min-width: 0;
   gap: 0.6rem;
   font-size: 0.8rem;
-  color: var(--rp-muted);
+  color: var(--text-faint);
 }
 
 .terminal__title p {
@@ -374,11 +415,11 @@ code {
   padding: 0.25rem 0.8rem;
   font: inherit;
   font-size: 0.78rem;
-  color: var(--rp-subtle);
+  color: var(--text-muted);
   cursor: pointer;
   background: transparent;
-  border: 1px solid var(--rp-overlay);
-  border-radius: 0.5rem;
+  border: var(--border-subtle);
+  border-radius: var(--radius);
   transition:
     color 140ms ease,
     background-color 140ms ease,
@@ -386,9 +427,9 @@ code {
 }
 
 .terminal__clear:hover {
-  color: var(--rp-text);
-  background: var(--rp-highlight-med);
-  border-color: var(--rp-highlight-high);
+  color: var(--text);
+  background: var(--bg-inset);
+  border-color: var(--border-strong);
 }
 
 .terminal__body {
@@ -397,7 +438,7 @@ code {
   padding: 1.1rem 1.25rem;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--rp-highlight-high) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 .terminal__body::-webkit-scrollbar {
@@ -409,12 +450,12 @@ code {
 }
 
 .terminal__body::-webkit-scrollbar-thumb {
-  background: var(--rp-highlight-med);
+  background: var(--border);
   border-radius: 999px;
 }
 
 .terminal__body::-webkit-scrollbar-thumb:hover {
-  background: var(--rp-highlight-high);
+  background: var(--border-strong);
 }
 
 .terminal__entry {
@@ -432,39 +473,133 @@ code {
   overflow-wrap: anywhere;
 }
 
-.terminal__output {
-  color: var(--rp-subtle);
+/* Commands typed by the visitor (or the boot sequence) read as bright input */
+.terminal__command {
+  color: var(--text);
+}
+
+/* Fast, subtle reveal — the system is alive, not a static page */
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.terminal__output,
+.terminal__rich {
+  animation: line-in 140ms ease-out both;
+}
+
+/* Semantic output tones */
+.terminal__output--default {
+  color: var(--text-muted);
+}
+
+.terminal__output--muted {
+  color: var(--text-faint);
+}
+
+.terminal__output--accent {
+  color: var(--accent);
+}
+
+.terminal__output--success {
+  color: var(--accent);
+}
+
+.terminal__output--error {
+  color: var(--red);
 }
 
 .terminal__output a {
-  color: var(--rp-foam);
+  color: var(--accent);
 }
 
 .terminal__prompt {
   font-weight: 700;
-  color: var(--rp-foam);
+  color: var(--accent);
   user-select: none;
 }
 
 .terminal__form {
   display: flex;
+  flex: none;
   align-items: center;
   gap: 0.6rem;
   padding: 0.8rem 1.25rem;
-  border-top: 1px solid var(--rp-overlay);
+  border-top: var(--border-subtle);
   transition: background-color 140ms ease;
 }
 
 .terminal__form:focus-within {
-  background: var(--rp-highlight-low);
+  background: rgb(80 250 123 / 4%);
+}
+
+/* Input + ghost completion + block caret share one field. The overlay
+   mirrors the input text invisibly so the caret and ghost suggestion
+   align exactly with what the visitor typed. */
+.terminal__field {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.terminal__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.terminal__mirror {
+  visibility: hidden;
+  white-space: pre;
+}
+
+.terminal__ghost {
+  color: var(--text-faint);
+  white-space: pre;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal__caret {
+  display: inline-block;
+  flex: none;
+  width: 0.55ch;
+  height: 1.1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: caret-blink 1.1s steps(1) infinite;
+}
+
+.terminal__caret--off {
+  display: none;
 }
 
 .terminal__input {
+  position: relative;
   width: 100%;
   padding: 0;
   font: inherit;
-  color: var(--rp-text);
-  caret-color: var(--rp-gold);
+  color: var(--text);
+  caret-color: var(--accent);
   background: transparent;
   border: 0;
 }
@@ -473,15 +608,328 @@ code {
   outline: 0;
 }
 
-/* Muted "statusline" strip at the bottom, like an editor status bar */
-.terminal__hint {
+/* One-tap command chips under the input — no typing required */
+.terminal__chips {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem 0.85rem;
+  border-top: var(--border-subtle);
+}
+
+.terminal__chip {
+  padding: 0.25rem 0.8rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--accent);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgb(80 250 123 / 35%);
+  border-radius: var(--radius);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.terminal__chip:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* Dock button shown when the red dot minimizes the terminal */
+.terminal-dock {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 70;
+  padding: 0.55rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  cursor: pointer;
+  background: var(--bg-raised);
+  border: 1px solid rgb(80 250 123 / 40%);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 44px -14px rgb(0 0 0 / 75%);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.terminal-dock:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+/* ------------------------------------------------------------------
+   Rendered command output — real UI inside the terminal viewport.
+   Terminal native: sharp corners, mono labels, thin borders.
+------------------------------------------------------------------ */
+.terminal__rich {
+  margin: 0.4rem 0 0.2rem;
+}
+
+.to-ls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.4rem;
+  white-space: normal;
+}
+
+.to-ls__item--file {
+  color: var(--text-muted);
+}
+
+.to-ls__item--dir {
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.to-ls__item--exec {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.to-ls__item--doc {
+  color: var(--amber);
+}
+
+/* projects — card grid */
+.to-projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.to-card {
+  padding: 0.9rem 1rem;
+  background: var(--bg-raised);
+  border: var(--border-subtle);
+  border-radius: var(--radius);
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.to-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.to-card__title {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.to-card__summary {
+  margin: 0.4rem 0;
+  color: var(--text-muted);
+}
+
+.to-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0 0 0.5rem;
+  list-style: none;
+}
+
+.to-tags li {
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  border: var(--border-subtle);
+  border-radius: 0.25rem;
+}
+
+.to-card__links {
+  display: flex;
+  gap: 1rem;
   margin: 0;
-  padding: 0.55rem 1.25rem;
-  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+
+/* experience — vertical timeline */
+.to-timeline {
+  padding: 0 0 0 1.1rem;
+  margin: 0;
+  list-style: none;
+  border-left: 1px solid var(--border-strong);
+}
+
+.to-timeline__item {
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.to-timeline__item::before {
+  position: absolute;
+  top: 0.45em;
+  left: calc(-1.1rem - 4px);
+  width: 7px;
+  height: 7px;
+  content: "";
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.to-timeline__item--link::before {
+  background: var(--border-strong);
+}
+
+.to-timeline__period {
+  margin: 0;
   font-size: 0.78rem;
-  color: var(--rp-muted);
-  background: var(--rp-surface);
-  border-top: 1px solid var(--rp-overlay);
+  color: var(--accent);
+}
+
+.to-timeline__role {
+  margin: 0.1rem 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.to-timeline__role span {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.to-timeline__summary {
+  margin: 0.2rem 0;
+  color: var(--text-muted);
+}
+
+.to-timeline__highlights {
+  padding-left: 1.1rem;
+  margin: 0.2rem 0 0;
+  color: var(--text-faint);
+}
+
+/* contact — an actual form, not "email me at…" */
+.to-contact__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin: 0 0 0.6rem;
+}
+
+.to-form {
+  display: grid;
+  max-width: 30rem;
+  gap: 0.55rem;
+}
+
+.to-form label {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.to-form label span {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.to-form input,
+.to-form textarea {
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  color: var(--text);
+  resize: vertical;
+  background: var(--bg-raised);
+  border: var(--border-subtle);
+  border-radius: 0.3rem;
+}
+
+.to-form input:focus,
+.to-form textarea:focus {
+  border-color: var(--accent);
+  outline: 0;
+}
+
+.to-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0.2rem 0 0;
+}
+
+.to-form button {
+  padding: 0.4rem 1.1rem;
+  font: inherit;
+  color: var(--bg);
+  cursor: pointer;
+  background: var(--accent);
+  border: 0;
+  border-radius: 0.3rem;
+  transition: filter 140ms ease;
+}
+
+.to-form button:hover {
+  filter: brightness(1.1);
+}
+
+.to-form__sent {
+  color: var(--accent);
+}
+
+/* cv — download button plus a rendered preview */
+.to-cv__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 0.6rem;
+}
+
+.to-button {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  color: var(--bg);
+  text-decoration: none;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 0.3rem;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.to-button:hover {
+  background: transparent;
+  color: var(--accent);
+}
+
+.to-button--ghost {
+  color: var(--accent);
+  background: transparent;
+}
+
+.to-button--ghost:hover {
+  background: var(--accent-soft);
+}
+
+.to-cv__preview {
+  max-width: 34rem;
+  padding: 0.7rem 1rem;
+  color: var(--text-muted);
+  background: var(--bg-raised);
+  border: var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+.to-cv__preview p {
+  margin: 0.3rem 0;
+}
+
+.to-cv__name {
+  color: var(--text);
+}
+
+.to-cv__period {
+  display: inline-block;
+  min-width: 7.5rem;
+  color: var(--text-faint);
 }
 
 /* ------------------------------------------------------------------
@@ -517,6 +965,8 @@ code {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }

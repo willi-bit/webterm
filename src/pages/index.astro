@@ -5,11 +5,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-  <section class="page-heading">
-    <p>Portfolio prototype</p>
-    <h1>{profile.name}</h1>
-    <p>{profile.role}</p>
-    <p>{profile.introduction}</p>
+  <section class="hero">
+    <h1>
+      {profile.name}
+      <span class="hero__role">{" — "}{profile.role}</span>
+    </h1>
   </section>
 
   <Terminal client:load />

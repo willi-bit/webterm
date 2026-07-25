@@ -25,7 +25,7 @@ const isCurrentRoute = (href: string) =>
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#232136" />
+    <meta name="theme-color" content="#0a0a12" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
@@ -49,6 +49,7 @@ const isCurrentRoute = (href: string) =>
                 <a
                   href={item.href}
                   aria-current={isCurrentRoute(item.href) ? "page" : undefined}
+                  {...("command" in item ? { "data-command": item.command } : {})}
                 >
                   {item.label}
                 </a>
@@ -63,8 +64,25 @@ const isCurrentRoute = (href: string) =>
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <p>Built with Astro and React. Prepared for Cloudflare Workers.</p>
-    </footer>
+
+    <script is:inline>
+      // When the terminal is on the page, navigation links with a matching
+      // command stop being routes: they run the command in the terminal and
+      // let it scroll itself into view. Everywhere else the links keep their
+      // normal behaviour, so the site still works without JavaScript.
+      document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element)) {
+          return;
+        }
+        const link = event.target.closest("a[data-command]");
+        if (!link || !document.querySelector("[data-terminal]")) {
+          return;
+        }
+        event.preventDefault();
+        window.dispatchEvent(
+          new CustomEvent("webterm:run", { detail: link.dataset.command }),
+        );
+      });
+    </script>
   </body>
 </html>
