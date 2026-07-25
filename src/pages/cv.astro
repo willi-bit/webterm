@@ -1,5 +1,6 @@
 ---
 import {
+  education,
   experience,
   profile,
   skillGroups,
@@ -15,11 +16,28 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <p>
       <a href={`mailto:${profile.email}`}>{profile.email}</a>
     </p>
+    <p class="page-actions">
+      <a class="button-link" href="/cv.pdf" download>Download English CV (PDF)</a>
+      <a class="button-link button-link--secondary" href="/cv.pdf">Open PDF</a>
+    </p>
   </header>
 
   <section aria-labelledby="cv-profile-heading">
     <h2 id="cv-profile-heading">Profile</h2>
     <p>{profile.introduction}</p>
+  </section>
+
+  <section aria-labelledby="cv-education-heading">
+    <h2 id="cv-education-heading">Education</h2>
+    {
+      education.map((item) => (
+        <article>
+          <h3>{item.degree} — {item.institution}</h3>
+          <p>{item.period} · {item.location}</p>
+          <p><strong>Selected coursework:</strong> {item.details.join(", ")}</p>
+        </article>
+      ))
+    }
   </section>
 
   <section aria-labelledby="cv-experience-heading">
@@ -47,8 +65,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   </section>
 
-  <p>
-    Add a PDF to <code>public/cv.pdf</code>, then add a download link here when the
-    final CV is available.
-  </p>
+  <section aria-labelledby="cv-languages-heading">
+    <h2 id="cv-languages-heading">Languages</h2>
+    <p>
+      {profile.languages.map((item) => `${item.language}: ${item.proficiency}`).join(" · ")}
+    </p>
+  </section>
 </BaseLayout>
