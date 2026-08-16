@@ -16,36 +16,38 @@ interface Props {
 const { project } = Astro.props;
 ---
 
-<BaseLayout title={project.title} description={project.summary}>
+<BaseLayout title={project.title} description={project.summary} width="narrow">
   <article>
     <header class="page-heading">
-      <p>cat projects/{project.slug}/README.md</p>
+      <p class="page-eyebrow">cat projects/{project.slug}/README.md</p>
       <h1>{project.title}</h1>
-      <p>{project.summary}</p>
+      <p class="page-lede">{project.summary}</p>
     </header>
 
     <p>{project.description}</p>
 
-    <h2>Technologies</h2>
-    <ul class="tag-list">
-      {project.technologies.map((technology) => <li>{technology}</li>)}
-    </ul>
+    <dl class="defs defs--spaced">
+      <div class="defs__row">
+        <dt>Technologies</dt>
+        <dd>{project.technologies.join(", ")}</dd>
+      </div>
+      {
+        project.links.length > 0 && (
+          <div class="defs__row">
+            <dt>Links</dt>
+            <dd>
+              {project.links.map((link, index) => (
+                <>
+                  <a href={link.href}>{link.label} ↗</a>
+                  {index < project.links.length - 1 && " · "}
+                </>
+              ))}
+            </dd>
+          </div>
+        )
+      }
+    </dl>
 
-    {
-      project.links.length > 0 && (
-        <>
-          <h2>Links</h2>
-          <ul>
-            {project.links.map((link) => (
-              <li>
-                <a href={link.href}>{link.label}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
-
-    <p><a href="/projects/">Back to all projects</a></p>
+    <p class="muted"><a href="/projects/">← All projects</a></p>
   </article>
 </BaseLayout>

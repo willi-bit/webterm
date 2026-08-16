@@ -7,12 +7,18 @@ interface Props {
   description?: string;
   /** Bare pages render no site header — the content is the whole experience. */
   bare?: boolean;
+  /**
+   * Content column width, like choosing a paper size: prose pages read best
+   * narrow, indexes and logs get more room, the CV is a full sheet.
+   */
+  width?: "narrow" | "medium" | "sheet";
 }
 
 const {
   title,
   description = profile.introduction,
   bare = false,
+  width,
 } = Astro.props;
 
 const documentTitle = title ? `${title} | ${profile.name}` : `${profile.name} | ${profile.role}`;
@@ -36,7 +42,7 @@ const isCurrentRoute = (href: string) =>
     <link rel="manifest" href="/site.webmanifest" />
     <title>{documentTitle}</title>
   </head>
-  <body>
+  <body class:list={[width && `page-width--${width}`]}>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
     {
@@ -67,5 +73,27 @@ const isCurrentRoute = (href: string) =>
     <main id="main-content" class:list={["site-main", { "site-main--bare": bare }]}>
       <slot />
     </main>
+
+    {
+      !bare && (
+        <footer class="site-footer">
+          <p>
+            © {new Date().getFullYear()} {profile.name} · {profile.location}
+          </p>
+          <ul>
+            <li>
+              <a href={`mailto:${profile.email}`}>Email</a>
+            </li>
+            {profile.socials.map((link) => (
+              <li>
+                <a href={link.href} rel="me">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </footer>
+      )
+    }
   </body>
 </html>

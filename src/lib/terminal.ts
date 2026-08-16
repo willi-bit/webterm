@@ -71,14 +71,36 @@ const knownRoutes: Record<string, string> = {
   contact: "/contact/",
 };
 
-/** Small virtual filesystem so `ls` and `cat` behave like a real shell. */
-const textFiles: Record<string, () => string[]> = {
-  "intro.txt": () => [profile.introduction],
-  "about.md": () => [...profile.about],
-  "readme.md": () => [
-    "This site is a terminal. Type help to list commands.",
-    "Tab completes, ↑/↓ recalls history, chips below work too.",
-  ],
+/**
+ * One small virtual filesystem, shared by `ls`, `cat`, and tab completion —
+ * a single source of truth so the three can never drift apart.
+ */
+export type FsEntry =
+  | { name: string; kind: "file"; read: () => string[] }
+  | { name: string; kind: "dir" | "exec" | "doc" };
+
+export const fileSystem: FsEntry[] = [
+  { name: "about.md", kind: "file", read: () => [...profile.about] },
+  { name: "contact.sh", kind: "exec" },
+  { name: "cv.pdf", kind: "doc" },
+  { name: "experience/", kind: "dir" },
+  { name: "intro.txt", kind: "file", read: () => [profile.introduction] },
+  { name: "projects/", kind: "dir" },
+  {
+    name: "README.md",
+    kind: "file",
+    read: () => [
+      "This site is a terminal. Type help to list commands.",
+      "Tab completes, ↑/↓ recalls history, chips below work too.",
+    ],
+  },
+];
+
+/** Candidates for the argument slot of commands that take one. */
+const argumentCandidates: Record<string, string[]> = {
+  cat: fileSystem.map((entry) => entry.name),
+  open: Object.keys(knownRoutes),
+  project: projects.map((project) => project.slug),
 };
 
 export function parseCommand(raw: string): ParsedCommand {
@@ -116,13 +138,45 @@ export function parseCommand(raw: string): ParsedCommand {
   return { name: name.toLowerCase(), args };
 }
 
+/**
+ * Splits the input into the token being completed and everything before it,
+ * so callers can swap the token for a completion without touching the rest.
+ */
+export function completionToken(input: string): { before: string; token: string } {
+  const match = /\S+$/.exec(input);
+  if (!match) {
+    return { before: input, token: "" };
+  }
+  return { before: input.slice(0, match.index), token: match[0] };
+}
+
+/**
+ * Context-aware completion: the first token completes command names, later
+ * tokens complete that command's arguments (files for cat, pages for open,
+ * slugs for project). Matching is case-insensitive; results keep their
+ * canonical spelling (e.g. README.md).
+ */
 export function getCompletions(input: string): string[] {
-  const normalized = input.trimStart().toLowerCase();
-  if (!normalized || normalized.includes(" ")) {
+  const trimmed = input.trimStart();
+  if (!trimmed) {
     return [];
   }
 
-  return commandNames.filter((command) => command.startsWith(normalized));
+  const tokens = trimmed.split(/\s+/);
+  const atFirstToken = tokens.length === 1 && !/\s$/.test(trimmed);
+
+  if (atFirstToken) {
+    const prefix = (tokens[0] ?? "").toLowerCase();
+    return commandNames.filter((command) => command.startsWith(prefix));
+  }
+
+  const [command = ""] = tokens;
+  const candidates = argumentCandidates[command.toLowerCase()] ?? [];
+  const token = /\s$/.test(trimmed) ? "" : (tokens.at(-1) ?? "");
+  const prefix = token.toLowerCase();
+  return candidates.filter((candidate) =>
+    candidate.toLowerCase().startsWith(prefix),
+  );
 }
 
 export function commonPrefix(values: string[]): string {
@@ -187,26 +241,39 @@ export function executeCommand(raw: string): CommandResult {
       };
 
     case "cat": {
-      const file = args[0]?.toLowerCase();
-      if (!file) {
+      const query = args[0];
+      if (!query) {
         return { output: [text("Usage: cat <file>. Try: cat intro.txt", "muted")] };
       }
-      if (file === "cv.pdf") {
-        return {
-          output: [text("cat: cv.pdf: binary file — use `cv` to preview it", "error")],
-        };
-      }
-      if (file === "contact.sh") {
-        return {
-          output: [text("cat: contact.sh: permission denied — use `contact` instead", "error")],
-        };
+
+      // `cat projects` should hit projects/ just like `cat projects/` would.
+      const wanted = query.replace(/\/+$/, "").toLowerCase();
+      const entry = fileSystem.find(
+        (item) => item.name.replace(/\/+$/, "").toLowerCase() === wanted,
+      );
+
+      if (!entry) {
+        return { output: [text(`cat: ${query}: no such file or directory`, "error")] };
       }
 
-      const loader = textFiles[file];
-      if (!loader) {
-        return { output: [text(`cat: ${file}: no such file or directory`, "error")] };
+      switch (entry.kind) {
+        case "dir":
+          return { output: [text(`cat: ${query}: Is a directory`, "error")] };
+        case "doc":
+          return {
+            output: [
+              text(`cat: ${entry.name}: binary file — use \`cv\` to preview it`, "error"),
+            ],
+          };
+        case "exec":
+          return {
+            output: [
+              text(`cat: ${entry.name}: permission denied — use \`contact\` instead`, "error"),
+            ],
+          };
+        case "file":
+          return { output: entry.read().map((line) => text(line)) };
       }
-      return { output: loader().map((line) => text(line)) };
     }
 
     case "projects":

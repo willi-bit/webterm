@@ -3,26 +3,35 @@ import { experience } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Experience">
+<BaseLayout title="Experience" width="medium">
   <header class="page-heading">
-    <p>cat experience.md</p>
+    <p class="page-eyebrow">open experience</p>
     <h1>Experience</h1>
-    <p>Selected roles, responsibilities, and outcomes.</p>
+    <p class="page-lede">Selected roles, responsibilities, and outcomes.</p>
   </header>
 
-  <ol class="content-list">
+  <ol class="log">
     {
       experience.map((item) => (
-        <li class="card">
-          <article>
-            <p>{item.period}</p>
-            <h2>{item.role}</h2>
-            <p>{item.company}</p>
-            <p>{item.summary}</p>
-            <ul>
+        <li class="log__entry">
+          <p class="period log__period">
+            {item.period.endsWith("Present") && (
+              <>
+                <span class="log__dot" aria-hidden="true" />
+                <span class="visually-hidden">Current position: </span>
+              </>
+            )}
+            {item.period}
+          </p>
+          <div>
+            <h2 class="log__role">
+              {item.role} <span>— {item.company}</span>
+            </h2>
+            <p class="log__summary">{item.summary}</p>
+            <ul class="log__highlights">
               {item.highlights.map((highlight) => <li>{highlight}</li>)}
             </ul>
-          </article>
+          </div>
         </li>
       ))
     }

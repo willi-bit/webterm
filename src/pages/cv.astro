@@ -6,69 +6,116 @@ import {
   skillGroups,
 } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Show links as plain addresses — they stay legible when printed on paper.
+const socials = profile.socials.map((link) => ({
+  ...link,
+  text: link.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""),
+}));
 ---
 
-<BaseLayout title="CV">
-  <header class="page-heading">
-    <p>open cv.pdf</p>
-    <h1>{profile.name}</h1>
-    <p>{profile.role} · {profile.location}</p>
-    <p>
-      <a href={`mailto:${profile.email}`}>{profile.email}</a>
-    </p>
-    <p class="page-actions">
-      <a class="button-link" href="/cv.pdf" download>Download English CV (PDF)</a>
-      <a class="button-link button-link--secondary" href="/cv.pdf">Open PDF</a>
-    </p>
-  </header>
+<BaseLayout title="CV" width="sheet">
+  <article class="cv-sheet">
+    <header class="cv-head">
+      <p class="page-eyebrow">open cv.pdf</p>
+      <h1 class="cv-name">{profile.name}</h1>
+      <p class="cv-role">{profile.role} · {profile.location}</p>
+      <p class="page-actions">
+        <a class="button-link" href="/cv.pdf" download>Download CV (PDF)</a>
+        <a class="button-link button-link--secondary" href="/cv.pdf">Open PDF</a>
+      </p>
+    </header>
 
-  <section aria-labelledby="cv-profile-heading">
-    <h2 id="cv-profile-heading">Profile</h2>
-    <p>{profile.introduction}</p>
-  </section>
+    <div class="cv-grid">
+      <div class="cv-main">
+        <section aria-labelledby="cv-profile-heading">
+          <h2 id="cv-profile-heading">Profile</h2>
+          <p>{profile.introduction}</p>
+        </section>
 
-  <section aria-labelledby="cv-education-heading">
-    <h2 id="cv-education-heading">Education</h2>
-    {
-      education.map((item) => (
-        <article>
-          <h3>{item.degree} — {item.institution}</h3>
-          <p>{item.period} · {item.location}</p>
-          <p><strong>Selected coursework:</strong> {item.details.join(", ")}</p>
-        </article>
-      ))
-    }
-  </section>
+        <section aria-labelledby="cv-experience-heading">
+          <h2 id="cv-experience-heading">Experience</h2>
+          {
+            experience.map((item) => (
+              <article class="cv-entry">
+                <header class="cv-entry__head">
+                  <h3>
+                    {item.role}
+                    <span class="cv-entry__company"> — {item.company}</span>
+                  </h3>
+                  <p class="period">{item.period}</p>
+                </header>
+                <p class="cv-entry__summary">{item.summary}</p>
+                <ul class="cv-entry__highlights">
+                  {item.highlights.map((highlight) => <li>{highlight}</li>)}
+                </ul>
+              </article>
+            ))
+          }
+        </section>
+      </div>
 
-  <section aria-labelledby="cv-experience-heading">
-    <h2 id="cv-experience-heading">Experience</h2>
-    {
-      experience.map((item) => (
-        <article>
-          <h3>{item.role} — {item.company}</h3>
-          <p>{item.period}</p>
-          <p>{item.summary}</p>
-          <ul>
-            {item.highlights.map((highlight) => <li>{highlight}</li>)}
+      <aside class="cv-rail">
+        <section aria-labelledby="cv-contact-heading">
+          <h2 id="cv-contact-heading">Contact</h2>
+          <ul class="cv-rail__list">
+            <li>
+              <a href={`mailto:${profile.email}`}>{profile.email}</a>
+            </li>
+            {
+              socials.map((link) => (
+                <li>
+                  <a href={link.href} rel="me">
+                    {link.text}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
-        </article>
-      ))
-    }
-  </section>
+        </section>
 
-  <section aria-labelledby="cv-skills-heading">
-    <h2 id="cv-skills-heading">Skills</h2>
-    {
-      skillGroups.map((group) => (
-        <p><strong>{group.title}:</strong> {group.items.join(", ")}</p>
-      ))
-    }
-  </section>
+        <section aria-labelledby="cv-skills-heading">
+          <h2 id="cv-skills-heading">Skills</h2>
+          {
+            skillGroups.map((group) => (
+              <p class="cv-rail__item">
+                <strong>{group.title}</strong>
+                <br />
+                {group.items.join(", ")}
+              </p>
+            ))
+          }
+        </section>
 
-  <section aria-labelledby="cv-languages-heading">
-    <h2 id="cv-languages-heading">Languages</h2>
-    <p>
-      {profile.languages.map((item) => `${item.language}: ${item.proficiency}`).join(" · ")}
-    </p>
-  </section>
+        <section aria-labelledby="cv-education-heading">
+          <h2 id="cv-education-heading">Education</h2>
+          {
+            education.map((item) => (
+              <div class="cv-rail__item">
+                <p>
+                  <strong>{item.institution}</strong>
+                </p>
+                <p>{item.degree}</p>
+                <p class="period">{item.period}</p>
+                <p class="cv-rail__meta">
+                  Coursework: {item.details.join(", ")}
+                </p>
+              </div>
+            ))
+          }
+        </section>
+
+        <section aria-labelledby="cv-languages-heading">
+          <h2 id="cv-languages-heading">Languages</h2>
+          {
+            profile.languages.map((item) => (
+              <p class="cv-rail__item">
+                <strong>{item.language}</strong> — {item.proficiency}
+              </p>
+            ))
+          }
+        </section>
+      </aside>
+    </div>
+  </article>
 </BaseLayout>

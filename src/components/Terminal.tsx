@@ -11,6 +11,7 @@ import {
 import {
   bootCommands,
   commonPrefix,
+  completionToken,
   executeCommand,
   getCompletions,
   type OutputItem,
@@ -204,13 +205,17 @@ export default function Terminal() {
     };
   }, [mode]);
 
+  // Ghost suggestion for the token at the caret — works for commands and
+  // for arguments alike (e.g. "cat in" suggests "tro.txt").
   const ghost = useMemo(() => {
     const [best] = getCompletions(input);
     if (best === undefined) {
       return "";
     }
-    const typed = input.trimStart().toLowerCase();
-    return best.startsWith(typed) ? best.slice(typed.length) : "";
+    const { token } = completionToken(input);
+    return best.toLowerCase().startsWith(token.toLowerCase())
+      ? best.slice(token.length)
+      : "";
   }, [input]);
 
   function submitCommand(event: FormEvent<HTMLFormElement>) {
@@ -253,13 +258,19 @@ export default function Terminal() {
       if (completions.length === 0) {
         return;
       }
-      if (completions.length === 1) {
-        setInput(`${completions[0]} `);
+
+      // Only the token at the caret is replaced; earlier tokens stay put.
+      const { before, token } = completionToken(input);
+      const apply = (completion: string) => `${before}${completion}`;
+
+      const [only] = completions;
+      if (completions.length === 1 && only !== undefined) {
+        setInput(`${apply(only)} `);
         return;
       }
       const prefix = commonPrefix(completions);
-      if (prefix.length > input.trimStart().length) {
-        setInput(prefix);
+      if (prefix.length > token.length) {
+        setInput(apply(prefix));
       } else {
         appendEntry(undefined, [
           { kind: "text", text: completions.join("  "), tone: "muted" },

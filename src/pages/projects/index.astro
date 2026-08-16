@@ -3,28 +3,26 @@ import { projects } from "../../data/site";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Projects">
+<BaseLayout title="Projects" width="medium">
   <header class="page-heading">
-    <p>ls projects/</p>
+    <p class="page-eyebrow">ls projects/</p>
     <h1>Projects</h1>
-    <p>Selected work with context, decisions, and results.</p>
+    <p class="page-lede">Selected work with context, decisions, and results.</p>
   </header>
 
-  <ul class="card-list">
+  <ol class="index">
     {
       projects.map((project) => (
-        <li class="card">
-          <article>
-            <h2>
+        <li class="index__row">
+          <div>
+            <h2 class="index__title">
               <a href={`/projects/${project.slug}/`}>{project.title}</a>
             </h2>
-            <p>{project.summary}</p>
-            <ul class="tag-list" aria-label={`${project.title} technologies`}>
-              {project.technologies.map((technology) => <li>{technology}</li>)}
-            </ul>
-          </article>
+            <p class="index__summary">{project.summary}</p>
+            <p class="index__meta">{project.technologies.join(" · ")}</p>
+          </div>
         </li>
       ))
     }
-  </ul>
+  </ol>
 </BaseLayout>

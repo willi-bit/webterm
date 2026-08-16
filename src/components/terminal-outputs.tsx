@@ -5,26 +5,17 @@ import {
   projects,
   skillGroups,
 } from "../data/site";
+import { fileSystem } from "../lib/terminal";
 
 interface OutputProps {
   style?: CSSProperties;
 }
 
-const lsEntries = [
-  { name: "about.md", type: "file" },
-  { name: "contact.sh", type: "exec" },
-  { name: "cv.pdf", type: "doc" },
-  { name: "experience/", type: "dir" },
-  { name: "intro.txt", type: "file" },
-  { name: "projects/", type: "dir" },
-  { name: "README.md", type: "file" },
-] as const;
-
 export function LsOutput({ style }: OutputProps) {
   return (
     <p className="terminal__rich to-ls" style={style}>
-      {lsEntries.map((entry) => (
-        <span key={entry.name} className={`to-ls__item to-ls__item--${entry.type}`}>
+      {fileSystem.map((entry) => (
+        <span key={entry.name} className={`to-ls__item to-ls__item--${entry.kind}`}>
           {entry.name}
         </span>
       ))}

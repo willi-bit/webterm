@@ -1,27 +1,48 @@
 ---
 import { profile } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const socials = profile.socials.map((link) => ({
+  ...link,
+  text: link.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""),
+}));
 ---
 
-<BaseLayout title="Contact">
+<BaseLayout title="Contact" width="narrow">
   <header class="page-heading">
-    <p>mail --compose</p>
+    <p class="page-eyebrow">mail --compose</p>
     <h1>Contact</h1>
-    <p>The static prototype uses direct contact links and collects no visitor data.</p>
+    <p class="page-lede">
+      Email is the fastest way to reach me — one tap, no form:
+    </p>
   </header>
 
-  <p>
-    Email: <a href={`mailto:${profile.email}`}>{profile.email}</a>
+  <p class="contact-hero">
+    <a href={`mailto:${profile.email}`}>{profile.email}</a>
   </p>
-  <p>Location: {profile.location}</p>
 
-  <ul>
-    {
-      profile.socials.map((link) => (
-        <li>
-          <a href={link.href} rel="me">{link.label}</a>
-        </li>
-      ))
-    }
-  </ul>
+  <section aria-labelledby="elsewhere-heading">
+    <h2 id="elsewhere-heading">Elsewhere</h2>
+    <ul class="link-list">
+      {
+        socials.map((link) => (
+          <li>
+            <a href={link.href} rel="me">
+              {link.label} ↗
+            </a>
+            <span class="muted">{link.text}</span>
+          </li>
+        ))
+      }
+      <li>
+        <span>Location</span>
+        <span class="muted">{profile.location}</span>
+      </li>
+    </ul>
+  </section>
+
+  <p class="muted">
+    Prefer the terminal? <a href="/?run=contact">Run <code>contact</code> on the
+    home page</a> — it has a form.
+  </p>
 </BaseLayout>

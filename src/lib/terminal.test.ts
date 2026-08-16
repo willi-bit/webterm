@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   bootCommands,
   commonPrefix,
+  completionToken,
   executeCommand,
+  fileSystem,
   getCompletions,
   parseCommand,
   type TextOutputItem,
@@ -30,14 +32,51 @@ describe("parseCommand", () => {
   });
 });
 
+describe("completionToken", () => {
+  it("splits the input at the last whitespace", () => {
+    expect(completionToken("cat in")).toEqual({ before: "cat ", token: "in" });
+    expect(completionToken("who")).toEqual({ before: "", token: "who" });
+  });
+
+  it("treats a trailing space as an empty fresh token", () => {
+    expect(completionToken("cat ")).toEqual({ before: "cat ", token: "" });
+    expect(completionToken("")).toEqual({ before: "", token: "" });
+  });
+});
+
 describe("getCompletions", () => {
-  it("completes unambiguous prefixes", () => {
+  it("completes unambiguous command prefixes", () => {
     expect(getCompletions("proj")).toEqual(["project", "projects"]);
     expect(getCompletions("who")).toEqual(["whoami"]);
   });
 
-  it("does not complete arguments", () => {
-    expect(getCompletions("open a")).toEqual([]);
+  it("completes file arguments for cat", () => {
+    expect(getCompletions("cat in")).toEqual(["intro.txt"]);
+    expect(getCompletions("cat read")).toEqual(["README.md"]);
+  });
+
+  it("matches arguments case-insensitively, even for the command", () => {
+    expect(getCompletions("CAT I")).toEqual(["intro.txt"]);
+  });
+
+  it("offers the whole virtual filesystem right after `cat `", () => {
+    // ls, cat, and completion all read from this one listing.
+    expect(getCompletions("cat ")).toEqual(fileSystem.map((entry) => entry.name));
+  });
+
+  it("completes page names for open", () => {
+    expect(getCompletions("open a")).toEqual(["about"]);
+    expect(getCompletions("open c")).toEqual(["cv", "contact"]);
+  });
+
+  it("completes project slugs for project", () => {
+    expect(getCompletions("project web")).toEqual(["webterm-portfolio"]);
+    expect(getCompletions("project ")).toHaveLength(2);
+  });
+
+  it("offers nothing for commands that take no argument", () => {
+    expect(getCompletions("sudo ")).toEqual([]);
+    expect(getCompletions("clear everything")).toEqual([]);
   });
 });
 
@@ -95,9 +134,23 @@ describe("executeCommand", () => {
     expect(textLines(result)[0]?.text.length).toBeGreaterThan(0);
   });
 
+  it("serves files regardless of casing", () => {
+    expect(textLines(executeCommand("cat README.md")).length).toBeGreaterThan(0);
+    expect(textLines(executeCommand("cat readme.md")).length).toBeGreaterThan(0);
+  });
+
+  it("tells directories apart from missing files", () => {
+    for (const query of ["projects", "experience/"]) {
+      const result = executeCommand(`cat ${query}`);
+      expect(textLines(result)[0]?.tone).toBe("error");
+      expect(textLines(result)[0]?.text).toContain("Is a directory");
+    }
+  });
+
   it("reports missing files as errors", () => {
     const result = executeCommand("cat secrets.env");
     expect(textLines(result)[0]?.tone).toBe("error");
+    expect(textLines(result)[0]?.text).toContain("no such file or directory");
   });
 
   it("turns sudo into an easter-egg error", () => {

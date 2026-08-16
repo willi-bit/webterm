@@ -25,9 +25,15 @@
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
     SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  /* Classic documents are serif; Georgia is on every machine, so this
+     costs no font download. Used sparingly — the CV is the document. */
+  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
 
   --radius: 0.4rem;
   --border-subtle: 1px solid var(--border);
+
+  /* Content column width — individual pages pick a narrower measure. */
+  --page-width: 72rem;
 
   color-scheme: dark;
 }
@@ -51,6 +57,7 @@ h2,
 h3 {
   line-height: 1.2;
   letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 h1 {
@@ -124,8 +131,21 @@ code {
 .site-header,
 .site-main,
 .site-footer {
-  width: min(72rem, calc(100% - 2rem));
+  width: min(var(--page-width), calc(100% - 2rem));
   margin-inline: auto;
+}
+
+/* Per-page measure: prose is narrow, logs/indexes get room, CV is a sheet. */
+.page-width--narrow {
+  --page-width: 42rem;
+}
+
+.page-width--medium {
+  --page-width: 56rem;
+}
+
+.page-width--sheet {
+  --page-width: 62rem;
 }
 
 .site-header {
@@ -200,32 +220,85 @@ code {
   padding-block: 1rem;
 }
 
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding-block: 1.5rem 2.25rem;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  border-top: var(--border-subtle);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.site-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+}
+
 /* ------------------------------------------------------------------
-   Content blocks (subpages)
+   Documents (subpages) — well-typeset pages, not app screens.
+   Hairlines, small labels, aligned columns, whitespace. No cards.
 ------------------------------------------------------------------ */
 .page-heading {
-  max-width: 48rem;
+  max-width: 46rem;
   margin-bottom: 3rem;
 }
 
-.profile-heading {
-  display: flex;
-  align-items: center;
-  gap: clamp(1.5rem, 5vw, 3rem);
-  margin-bottom: 3rem;
+.page-heading h1 {
+  margin: 0 0 0.9rem;
 }
 
-.profile-heading .page-heading {
-  margin-bottom: 0;
+/* The one terminal nod on each page: the command that "rendered" it */
+.page-eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: var(--accent);
 }
 
-.profile-photo {
-  flex: none;
-  width: clamp(8rem, 22vw, 12rem);
-  height: auto;
-  border: 1px solid var(--border-strong);
-  border-radius: 50%;
-  box-shadow: 0 0 2rem -0.75rem rgb(80 250 123 / 35%);
+.page-eyebrow::before {
+  content: "$ ";
+  color: var(--text-faint);
+}
+
+.page-lede {
+  font-size: 1.06rem;
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* Dates and periods: mono, tabular, quiet — they align everywhere. */
+.period {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  white-space: nowrap;
 }
 
 .page-actions {
@@ -253,85 +326,419 @@ code {
   background: transparent;
 }
 
-/* The small command-style label above each page title */
-.page-heading > p:first-child {
-  margin: 0 0 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.03em;
-  color: var(--accent);
+/* Facts as a definition table — label column, value column, hairlines */
+.defs {
+  margin: 0;
 }
 
-.page-heading > p:first-child::before {
-  content: "$ ";
+.defs--spaced {
+  margin-top: 2.5rem;
+}
+
+.defs__row {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: 0.25rem 2rem;
+  padding-block: 0.75rem;
+}
+
+.defs__row + .defs__row {
+  border-top: var(--border-subtle);
+}
+
+.defs dt {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.defs dd {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* About — photo and prose in an editorial two-column layout */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 3.5rem);
+  align-items: start;
+}
+
+.about-grid .page-heading {
+  margin-bottom: 1.4rem;
+}
+
+.profile-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+}
+
+/* Experience — a log: fixed period rail on the left, entry on the right */
+.log {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.log__entry {
+  display: grid;
+  grid-template-columns: minmax(0, 10.5rem) minmax(0, 1fr);
+  gap: 0.4rem 2.5rem;
+  padding-block: 1.9rem;
+}
+
+.log__entry + .log__entry {
+  border-top: var(--border-subtle);
+}
+
+.log__period {
+  display: flex;
+  align-items: center;
+  align-self: start;
+  gap: 0.55rem;
+  padding-top: 0.3em;
+}
+
+/* A small green status dot on the current role */
+.log__dot {
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.log__role {
+  margin: 0 0 0.15rem;
+  font-size: 1.18rem;
+}
+
+.log__role span {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.log__summary {
+  margin: 0.4rem 0;
+  color: var(--text-muted);
+}
+
+.log__highlights {
+  padding-left: 1.15rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.log__highlights li + li {
+  margin-top: 0.3rem;
+}
+
+.log__highlights li::marker {
   color: var(--text-faint);
 }
 
-.page-heading h1 {
-  margin: 0 0 0.9rem;
+/* Projects — an index table: numbered rows, big linked titles */
+.index {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  counter-reset: index;
 }
 
-.page-heading > p:not(:first-child) {
+.index__row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.5rem) minmax(0, 1fr);
+  gap: 0 1.75rem;
+  padding-block: 1.75rem;
+  counter-increment: index;
+}
+
+.index__row + .index__row {
+  border-top: var(--border-subtle);
+}
+
+.index__row::before {
+  content: counter(index, decimal-leading-zero);
+  padding-top: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}
+
+.index__title {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.index__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.index__title a:hover {
+  color: var(--accent);
+}
+
+.index__summary {
+  margin: 0.45rem 0;
   color: var(--text-muted);
 }
 
-.content-list,
-.card-list {
-  display: grid;
-  gap: 1.25rem;
+.index__meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+/* Contact — the address is the hero, one tap to mail */
+.contact-hero {
+  margin: 0 0 2.75rem;
+}
+
+.contact-hero a {
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 5.5vw, 2.75rem);
+  color: var(--text);
+  text-decoration-color: rgb(80 250 123 / 45%);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.contact-hero a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+/* A short list of links, set like table rows */
+.link-list {
   padding: 0;
+  margin: 0;
   list-style: none;
 }
 
-.card {
-  padding: 1.5rem;
+.link-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 0.7rem;
+}
+
+.link-list li + li {
+  border-top: var(--border-subtle);
+}
+
+.link-list li:first-child {
+  border-top: var(--border-subtle);
+}
+
+.link-list a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.link-list a:hover {
+  color: var(--accent);
+}
+
+.link-list .muted {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+/* ------------------------------------------------------------------
+   CV — a sheet of paper on the screen; prints as a real document.
+------------------------------------------------------------------ */
+.cv-sheet {
+  padding: clamp(1.75rem, 5vw, 3.5rem);
   background: var(--bg-raised);
   border: var(--border-subtle);
-  border-radius: var(--radius);
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  border-radius: 0.5rem;
+  box-shadow: 0 30px 70px -30px rgb(0 0 0 / 75%);
 }
 
-.card:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 14px 34px -16px rgb(0 0 0 / 60%);
-  transform: translateY(-2px);
+.cv-head {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: var(--border-subtle);
 }
 
-.card h2,
-.card h3 {
-  margin-top: 0;
+.cv-name {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
 }
 
-.card > :last-child,
-.card article > :last-child {
+.cv-role {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+.cv-head .page-actions {
   margin-bottom: 0;
 }
 
-.tag-list {
+/* Two-column résumé: rail holds facts, main column holds the story.
+   DOM order is main-first so phones and screen readers get the story
+   before the sidebar; grid areas put the rail on the left on desktop. */
+.cv-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-areas: "rail main";
+  gap: 2.5rem clamp(2.5rem, 5vw, 4rem);
+}
+
+.cv-rail {
+  grid-area: rail;
+}
+
+.cv-main {
+  grid-area: main;
+}
+
+.cv-sheet section + section {
+  margin-top: 2.25rem;
+}
+
+/* Section labels: small, letterspaced, with a hairline rule */
+.cv-sheet h2 {
+  margin: 0 0 1.1rem;
+  padding-bottom: 0.45rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-bottom: var(--border-subtle);
+}
+
+.cv-entry + .cv-entry {
+  margin-top: 1.75rem;
+}
+
+.cv-entry__head {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 1.5rem;
+}
+
+.cv-entry h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.12rem;
+}
+
+.cv-entry__company {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.cv-entry__summary {
+  margin: 0.35rem 0;
+  color: var(--text-muted);
+}
+
+.cv-entry__highlights {
+  padding-left: 1.15rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.cv-entry__highlights li + li {
+  margin-top: 0.3rem;
+}
+
+.cv-entry__highlights li::marker {
+  color: var(--text-faint);
+}
+
+.cv-rail__list {
   padding: 0;
+  margin: 0;
   list-style: none;
 }
 
-.tag-list li {
-  padding: 0.2rem 0.7rem;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  background: var(--bg-inset);
-  border: var(--border-subtle);
-  border-radius: 999px;
+.cv-rail__list li + li {
+  margin-top: 0.35rem;
 }
 
-@media (max-width: 36rem) {
-  .profile-heading {
-    align-items: flex-start;
-    flex-direction: column;
+.cv-rail__list a {
+  color: var(--text-muted);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.cv-rail__list a:hover {
+  color: var(--accent);
+}
+
+.cv-rail__item {
+  margin: 0.55rem 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.cv-rail__item p {
+  margin: 0.15rem 0;
+}
+
+.cv-rail__item strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cv-rail__meta {
+  font-size: 0.85rem;
+  color: var(--text-faint);
+}
+
+@media (max-width: 48rem) {
+  .cv-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "rail";
+    gap: 0;
+  }
+
+  .cv-rail {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: var(--border-subtle);
+  }
+}
+
+@media (max-width: 40rem) {
+  .about-grid,
+  .log__entry,
+  .defs__row {
+    grid-template-columns: 1fr;
+  }
+
+  .about-grid {
+    gap: 1.75rem;
+  }
+
+  .profile-photo {
+    width: 9rem;
+  }
+
+  .log__entry {
+    gap: 0.15rem;
+    padding-block: 1.5rem;
+  }
+
+  .log__period {
+    padding-top: 0;
   }
 }
 
@@ -986,6 +1393,124 @@ code {
 
   .terminal__body {
     padding: 1rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Print — Ctrl+P on the CV produces a clean black-on-white document.
+   The generic rules help every page; the CV gets the full treatment.
+------------------------------------------------------------------ */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    color: #1a1a1a;
+    background: #fff;
+  }
+
+  /* Chrome and actions stay on screen — paper gets the content only */
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .page-eyebrow,
+  .page-actions {
+    display: none;
+  }
+
+  .site-main {
+    width: auto;
+    min-height: 0;
+    padding-block: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  code {
+    padding: 0;
+    color: inherit;
+    background: none;
+    border: 0;
+  }
+
+  .page-lede,
+  .muted,
+  .period,
+  .cv-role,
+  .cv-entry__company,
+  .cv-entry__summary,
+  .cv-entry__highlights,
+  .cv-rail__item,
+  .cv-rail__list a,
+  .log__role span,
+  .log__summary,
+  .log__highlights,
+  .index__summary,
+  .index__meta,
+  .index__row::before,
+  .defs dd {
+    color: #333;
+  }
+
+  .cv-sheet {
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .cv-name {
+    font-size: 26pt;
+    color: #000;
+  }
+
+  .cv-head {
+    border-color: #bbb;
+  }
+
+  /* Print pages are narrower than the sheet breakpoint — force the
+     two-column résumé grid with a slimmer rail. */
+  .cv-grid {
+    grid-template-columns: 10.5rem 1fr;
+    grid-template-areas: "rail main";
+    gap: 1.5rem 2.25rem;
+  }
+
+  .cv-rail {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .cv-sheet h2 {
+    color: #555;
+    border-color: #ccc;
+  }
+
+  .cv-entry h3,
+  .cv-rail__item strong {
+    color: #000;
+  }
+
+  .cv-entry__highlights li::marker,
+  .log__highlights li::marker {
+    color: #777;
+  }
+
+  .cv-rail__meta {
+    color: #555;
+  }
+
+  .cv-entry,
+  .cv-rail section,
+  .log__entry,
+  .index__row {
+    break-inside: avoid;
   }
 }
 
