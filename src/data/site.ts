@@ -152,13 +152,15 @@ export const projects: Project[] = [
   },
   {
     slug: "microservice-architecture-visualization",
-    title: "Microservice Architecture Visualization",
+    title: "Bachelor Tool",
     summary:
-      "A bachelor's thesis application for visualizing microservice architectures and communication patterns, graded 1.0.",
+      "A bachelor's thesis tool that visualizes producer-consumer relationships in Java projects, graded 1.0.",
     description:
-      "Developed an application that is used in projects at adesso. Designed and conducted a two-phase study to evaluate the application, guide its practical development, and improve usability.",
+      "Scans Java source code for @Producer and @Consumer annotations and generates a graph for an included web UI. A two-phase study guided its development and usability improvements.",
     technologies: ["Java", "Maven", "React"],
-    links: [],
+    links: [
+      { label: "GitHub", href: "https://github.com/willi-bit/bachelor-tool" },
+    ],
   },
 ];
 
