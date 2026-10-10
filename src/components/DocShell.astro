@@ -1,0 +1,138 @@
+---
+import { projects } from "../data/site";
+import Panel from "./Panel.astro";
+
+/**
+ * Frame for the document pages: an explorer tree (like neo-tree in a
+ * Neovim layout) and the document itself, rendered `glow`-style with a
+ * vim statusline that tracks the scroll position.
+ */
+export interface OutlineItem {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  /** File name shown in the panel title and statusline, e.g. `about.md`. */
+  file: string;
+  /** The command that "rendered" this page, shown above the content. */
+  command: string;
+  filetype?: string;
+  outline?: OutlineItem[];
+  explorer?: boolean;
+  wide?: boolean;
+}
+
+const {
+  file,
+  command,
+  filetype = "markdown",
+  outline = [],
+  explorer = true,
+  wide = false,
+} = Astro.props;
+
+const path = Astro.url.pathname;
+
+type TreeKind = "dir" | "md" | "pdf" | "exec" | "home";
+interface TreeEntry {
+  name: string;
+  href: string;
+  kind: TreeKind;
+  depth: number;
+  title?: string;
+}
+
+const tree: TreeEntry[] = [
+  { name: "README.md", href: "/", kind: "home", depth: 0, title: "The terminal (home)" },
+  { name: "about.md", href: "/about/", kind: "md", depth: 0 },
+  { name: "experience/", href: "/experience/", kind: "dir", depth: 0 },
+  { name: "projects/", href: "/projects/", kind: "dir", depth: 0 },
+  ...projects.map((project) => ({
+    name: `${project.slug}/`,
+    href: `/projects/${project.slug}/`,
+    kind: "dir" as const,
+    depth: 1,
+    title: project.title,
+  })),
+  { name: "cv.pdf", href: "/cv/", kind: "pdf", depth: 0 },
+  { name: "contact.sh", href: "/contact/", kind: "exec", depth: 0 },
+];
+
+const isCurrent = (href: string) => href === path || (href !== "/" && path === href.replace(/\/$/, ""));
+---
+
+<div class:list={["doc-grid", { "doc-grid--no-explorer": !explorer, "doc-grid--wide": wide }]}>
+  {
+    explorer && (
+      <Panel tag="nav" title="explorer" glyph="▾" class="panel--tree" label="Site files">
+        <p class="tree__root">~/portfolio/</p>
+        <ul class="tree">
+          {tree.map((entry) => (
+            <li style={`--depth: ${entry.depth}`}>
+              <a
+                href={entry.href}
+                class={`tree__item tree__item--${entry.kind}`}
+                aria-current={isCurrent(entry.href) ? "page" : undefined}
+                title={entry.title}
+              >
+                <span class="tree__icon" aria-hidden="true">
+                  {entry.kind === "dir" ? "▸" : entry.kind === "exec" ? "$" : entry.kind === "pdf" ? "◫" : entry.kind === "home" ? ">" : "#"}
+                </span>
+                <span class="tree__name">{entry.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        {outline.length > 0 && (
+          <>
+            <p class="tree__heading">outline</p>
+            <ul class="outline">
+              {outline.map((item) => (
+                <li>
+                  <a href={`#${item.id}`}>{item.label}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Panel>
+    )
+  }
+
+  <Panel tag="article" title={file} meta={filetype} glyph="●" class="panel--doc" label={file}>
+    <div class="doc">
+      <p class="doc__command"><span aria-hidden="true">$ </span>{command}</p>
+      <slot />
+    </div>
+    <footer class="statusline" aria-hidden="true">
+      <span class="statusline__mode">NORMAL</span>
+      <span class="statusline__file">{file}</span>
+      <span class="statusline__fill"></span>
+      <span class="statusline__item statusline__item--optional">utf-8</span>
+      <span class="statusline__item statusline__item--optional">{filetype}</span>
+      <span class="statusline__pos" data-scroll-pos>Top</span>
+    </footer>
+  </Panel>
+</div>
+
+<script>
+  // Vim-style scroll indicator: Top / NN% / Bot / All.
+  const indicator = document.querySelector<HTMLElement>("[data-scroll-pos]");
+  const update = () => {
+    if (!indicator) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (max <= 4) {
+      indicator.textContent = "All";
+    } else if (window.scrollY <= 2) {
+      indicator.textContent = "Top";
+    } else if (window.scrollY >= max - 2) {
+      indicator.textContent = "Bot";
+    } else {
+      indicator.textContent = `${Math.round((window.scrollY / max) * 100)}%`;
+    }
+  };
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+</script>

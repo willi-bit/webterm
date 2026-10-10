@@ -1,5 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
+import DocShell from "../../components/DocShell.astro";
 import { projects, type Project } from "../../data/site";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
@@ -14,40 +15,52 @@ interface Props {
 }
 
 const { project } = Astro.props;
+const index = projects.indexOf(project);
+const next = projects[(index + 1) % projects.length];
 ---
 
-<BaseLayout title={project.title} description={project.summary} width="narrow">
-  <article>
-    <header class="page-heading">
-      <p class="page-eyebrow">cat projects/{project.slug}/README.md</p>
-      <h1>{project.title}</h1>
-      <p class="page-lede">{project.summary}</p>
-    </header>
-
+<BaseLayout title={project.title} description={project.summary}>
+  <DocShell
+    file={`${project.slug}/README.md`}
+    command={`cat projects/${project.slug}/README.md`}
+    outline={[
+      { id: "readme", label: `# ${project.title.toLowerCase()}` },
+      { id: "stack", label: "## stack" },
+      { id: "links", label: "## links" },
+    ]}
+  >
+    <h1 class="doc-title" id="readme">{project.title}</h1>
+    <p class="lede">{project.summary}</p>
     <p>{project.description}</p>
 
-    <dl class="defs defs--spaced">
-      <div class="defs__row">
-        <dt>Technologies</dt>
-        <dd>{project.technologies.join(", ")}</dd>
-      </div>
-      {
-        project.links.length > 0 && (
-          <div class="defs__row">
-            <dt>Links</dt>
-            <dd>
-              {project.links.map((link, index) => (
-                <>
-                  <a href={link.href}>{link.label} ↗</a>
-                  {index < project.links.length - 1 && " · "}
-                </>
-              ))}
-            </dd>
-          </div>
-        )
-      }
-    </dl>
+    <h2 id="stack">Stack</h2>
+    <ul class="tags tags--large">
+      {project.technologies.map((technology) => <li>{technology}</li>)}
+    </ul>
 
-    <p class="muted"><a href="/projects/">← All projects</a></p>
-  </article>
+    <h2 id="links">Links</h2>
+    <ul class="link-rows">
+      {
+        project.links.map((link) => (
+          <li>
+            <a href={link.href}>
+              <span class="link-rows__label">{link.label.toLowerCase()}</span>
+              <span class="link-rows__value">{link.href.replace(/^https?:\/\//, "")} ↗</span>
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href={`/?run=${encodeURIComponent(`project ${project.slug}`)}`}>
+          <span class="link-rows__label">terminal</span>
+          <span class="link-rows__value">project {project.slug}</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="doc__next">
+      <a href="/projects/">← cd ..</a>
+      {next && next !== project && <a href={`/projects/${next.slug}/`}>next: {next.title} →</a>}
+    </p>
+  </DocShell>
 </BaseLayout>

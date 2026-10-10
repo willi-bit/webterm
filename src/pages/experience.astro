@@ -1,39 +1,80 @@
 ---
-import { experience } from "../data/site";
+import DocShell from "../components/DocShell.astro";
+import { education, experience } from "../data/site";
+import { formatDuration, formatPeriod, monthsBetween } from "../lib/dates";
+import { shortHash } from "../lib/shell/render";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const entries = experience.map((item) => ({
+  ...item,
+  id: `${slug(item.company)}-${item.start}`,
+  hash: shortHash(`${item.company}${item.start}`),
+  // Durations of ongoing roles would go stale in a static build.
+  duration: item.end ? formatDuration(monthsBetween(item.start, item.end, new Date())) : null,
+}));
+const degree = education[0];
 ---
 
-<BaseLayout title="Experience" width="medium">
-  <header class="page-heading">
-    <p class="page-eyebrow">open experience</p>
-    <h1>Experience</h1>
-    <p class="page-lede">Selected roles, responsibilities, and outcomes.</p>
-  </header>
+<BaseLayout title="Experience" description="Work history of Willi Bittorf, as a git log.">
+  <DocShell
+    file="experience/"
+    command="git log --graph experience/"
+    filetype="git log"
+    outline={entries.map((item) => ({ id: item.id, label: `${item.hash} ${item.company.split(" | ")[0]}` }))}
+  >
+    <h1 class="doc-title">Experience</h1>
+    <p class="lede">Roles, responsibilities, and outcomes, newest first.</p>
 
-  <ol class="log">
-    {
-      experience.map((item) => (
-        <li class="log__entry">
-          <p class="period log__period">
-            {item.period.endsWith("Present") && (
-              <>
-                <span class="log__dot" aria-hidden="true" />
-                <span class="visually-hidden">Current position: </span>
-              </>
-            )}
-            {item.period}
-          </p>
-          <div>
+    <ol class="log">
+      {
+        entries.map((item) => (
+          <li class:list={["log__entry", { "log__entry--head": !item.end }]} id={item.id}>
+            <span class="log__dot" aria-hidden="true" />
+            <p class="log__meta">
+              <span class="log__hash">{item.hash}</span>
+              {!item.end && (
+                <span class="log__ref">
+                  HEAD <span aria-hidden="true">→</span> main<span class="visually-hidden"> (current position)</span>
+                </span>
+              )}
+              <span class="log__period">{formatPeriod(item.start, item.end)}</span>
+              {item.duration && <span class="log__duration">{item.duration}</span>}
+            </p>
             <h2 class="log__role">
-              {item.role} <span>— {item.company}</span>
+              {item.role} <span>@ {item.company}</span>
             </h2>
             <p class="log__summary">{item.summary}</p>
             <ul class="log__highlights">
-              {item.highlights.map((highlight) => <li>{highlight}</li>)}
+              {item.highlights.map((highlight) => (
+                <li>{highlight}</li>
+              ))}
             </ul>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
+          </li>
+        ))
+      }
+      {
+        degree && (
+          <li class="log__entry log__entry--tag">
+            <span class="log__dot" aria-hidden="true" />
+            <p class="log__meta">
+              <span class="log__hash">{shortHash(degree.institution)}</span>
+              <span class="log__ref log__ref--tag">tag: b.sc.</span>
+              <span class="log__period">{formatPeriod(degree.start, degree.end)}</span>
+            </p>
+            <h2 class="log__role">
+              {degree.degree} <span>@ {degree.institution}</span>
+            </h2>
+            <p class="log__summary">
+              Final grade {degree.grade}. More in <a href="/about/#education">about.md</a>.
+            </p>
+          </li>
+        )
+      }
+    </ol>
+
+    <p class="doc__next">
+      <a href="/projects/">next: projects →</a>
+    </p>
+  </DocShell>
 </BaseLayout>

@@ -1,16 +1,50 @@
 ---
+import DocShell from "../components/DocShell.astro";
+import { navigation } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const banner = [
+  "██╗  ██╗ ██████╗ ██╗  ██╗",
+  "██║  ██║██╔═████╗██║  ██║",
+  "███████║██║██╔██║███████║",
+  "╚════██║████╔╝██║╚════██║",
+  "     ██║╚██████╔╝     ██║",
+  "     ╚═╝ ╚═════╝      ╚═╝",
+]
+  // Only the solid blocks: box-drawing strokes don't join up in HTML text.
+  .map((line) => line.replace(/[^█ ]/g, " "))
+  .join("\n");
 ---
 
-<BaseLayout
-  title="Not found"
-  description="The requested page could not be found."
-  width="narrow"
->
-  <header class="page-heading">
-    <p class="page-eyebrow">command not found</p>
-    <h1>404</h1>
-    <p class="page-lede">The requested page does not exist.</p>
-    <p><a href="/">Return to the terminal</a></p>
-  </header>
+<BaseLayout title="Not found" description="The requested page could not be found.">
+  <DocShell file="404" command="cd …" filetype="error" explorer={false}>
+    <pre class="banner-404" aria-hidden="true">{banner}</pre>
+    <h1 class="doc-title">Not found</h1>
+    <p class="error-line">
+      wsh: cd: <span data-missing-path>this page</span>: No such file or directory
+    </p>
+    <p>Here is what does exist:</p>
+    <ul class="ls-grid">
+      {
+        navigation.map((item) => (
+          <li>
+            <a href={item.href}>{item.href === "/" ? "~/" : `${item.label.toLowerCase()}/`}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="callout">
+      <span class="callout__prompt" aria-hidden="true">❯</span>
+      <span><a href="/">Back to the terminal</a></span>
+    </p>
+  </DocShell>
 </BaseLayout>
+
+<script>
+  const missing = document.querySelector("[data-missing-path]");
+  const command = document.querySelector(".doc__command");
+  if (missing && window.location.pathname !== "/404" && window.location.pathname !== "/404.html") {
+    missing.textContent = window.location.pathname;
+    if (command) command.lastChild!.textContent = `cd ${window.location.pathname}`;
+  }
+</script>

@@ -1,70 +1,113 @@
 ---
-import { education, profile, skillGroups } from "../data/site";
+import DocShell from "../components/DocShell.astro";
+import { education, experience, profile, skillGroups } from "../data/site";
+import { formatPeriod } from "../lib/dates";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const current = experience.find((item) => !item.end);
+const degree = education[0];
+
+const facts: [string, string][] = [
+  ["name", profile.name],
+  ["role", profile.role],
+  ["based", profile.location],
+  ...(current ? [["now", `${current.role}, ${current.company}`] as [string, string]] : []),
+  ...(degree ? [["studied", `B.Sc. Computer Science, ${degree.institution}`] as [string, string]] : []),
+];
 ---
 
-<BaseLayout title="About" width="medium">
-  <div class="about-grid">
-    <img
-      class="profile-photo"
-      src="/images/willi-bittorf.jpg"
-      width="300"
-      height="300"
-      alt="Portrait of Willi Bittorf"
-    />
-    <div>
-      <header class="page-heading">
-        <p class="page-eyebrow">whoami</p>
-        <h1>About</h1>
-        <p class="page-lede">{profile.introduction}</p>
-      </header>
-      {profile.about.map((paragraph) => <p>{paragraph}</p>)}
-    </div>
-  </div>
+<BaseLayout title="About">
+  <DocShell
+    file="about.md"
+    command="cat about.md"
+    outline={[
+      { id: "about", label: "# about" },
+      { id: "skills", label: "## skills" },
+      { id: "education", label: "## education" },
+      { id: "languages", label: "## languages" },
+    ]}
+  >
+    <header class:list={["about-head", { "about-head--no-photo": !profile.photo }]} id="about">
+      {
+        profile.photo && (
+          <figure class="portrait">
+            <img src={profile.photo} width="300" height="300" alt={`Portrait of ${profile.name}`} />
+          </figure>
+        )
+      }
+      <div class="about-head__text">
+        <h1 class="doc-title">About</h1>
+        <dl class="fetch">
+          {
+            facts.map(([key, value]) => (
+              <div>
+                <dt>{key}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </header>
 
-  <section aria-labelledby="skills-heading">
-    <h2 id="skills-heading">Skills</h2>
-    <dl class="defs">
+    <p class="lede">{profile.introduction}</p>
+    {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+
+    <h2 id="skills">Skills</h2>
+    <dl class="leaders">
       {
         skillGroups.map((group) => (
-          <div class="defs__row">
+          <div>
             <dt>{group.title}</dt>
-            <dd>{group.items.join(", ")}</dd>
+            <dd>
+              <ul class="tags">
+                {group.items.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </dd>
           </div>
         ))
       }
     </dl>
-  </section>
 
-  <section aria-labelledby="education-heading">
-    <h2 id="education-heading">Education</h2>
+    <h2 id="education">Education</h2>
     {
       education.map((item) => (
-        <article>
-          <p class="period">
-            {item.period} · {item.location}
+        <article class="entry">
+          <p class="entry__meta">
+            <span class="entry__period">{formatPeriod(item.start, item.end)}</span>
+            <span>{item.location}</span>
           </p>
-          <h3>{item.degree}</h3>
-          <p class="muted">{item.institution}</p>
-          <p class="muted">
-            <strong>Selected coursework:</strong> {item.details.join(", ")}
+          <h3 class="entry__title">{item.degree}</h3>
+          <p class="entry__org">
+            {item.institution}
+            {item.grade && <span> · final grade {item.grade}</span>}
           </p>
+          <p class="entry__label">Selected coursework</p>
+          <ul class="tags">
+            {item.details.map((detail) => (
+              <li>{detail}</li>
+            ))}
+          </ul>
         </article>
       ))
     }
-  </section>
 
-  <section aria-labelledby="languages-heading">
-    <h2 id="languages-heading">Languages</h2>
-    <dl class="defs">
+    <h2 id="languages">Languages</h2>
+    <dl class="leaders">
       {
         profile.languages.map((item) => (
-          <div class="defs__row">
+          <div>
             <dt>{item.language}</dt>
             <dd>{item.proficiency}</dd>
           </div>
         ))
       }
     </dl>
-  </section>
+
+    <p class="doc__next">
+      <a href="/experience/">next: experience →</a>
+    </p>
+  </DocShell>
 </BaseLayout>

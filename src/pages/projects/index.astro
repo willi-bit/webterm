@@ -1,28 +1,45 @@
 ---
+import DocShell from "../../components/DocShell.astro";
 import { projects } from "../../data/site";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="Projects" width="medium">
-  <header class="page-heading">
-    <p class="page-eyebrow">ls projects/</p>
-    <h1>Projects</h1>
-    <p class="page-lede">Selected work with context, decisions, and results.</p>
-  </header>
+<BaseLayout title="Projects" description="Selected projects by Willi Bittorf.">
+  <DocShell
+    file="projects/"
+    command="ls -l projects/"
+    filetype="directory"
+    outline={projects.map((project) => ({ id: project.slug, label: project.slug }))}
+  >
+    <h1 class="doc-title">Projects</h1>
+    <p class="lede">Selected work, with context, decisions, and results.</p>
 
-  <ol class="index">
-    {
-      projects.map((project) => (
-        <li class="index__row">
-          <div>
-            <h2 class="index__title">
+    <ol class="cards">
+      {
+        projects.map((project, index) => (
+          <li class="card" id={project.slug}>
+            <p class="card__title" aria-hidden="true">
+              <span class="card__index">{String(index + 1).padStart(2, "0")}</span>
+              <span>{project.slug}/</span>
+            </p>
+            <h2 class="card__name">
               <a href={`/projects/${project.slug}/`}>{project.title}</a>
             </h2>
-            <p class="index__summary">{project.summary}</p>
-            <p class="index__meta">{project.technologies.join(" · ")}</p>
-          </div>
-        </li>
-      ))
-    }
-  </ol>
+            <p class="card__summary">{project.summary}</p>
+            <ul class="tags" aria-label="Technologies">
+              {project.technologies.map((technology) => (
+                <li>{technology}</li>
+              ))}
+            </ul>
+            <p class="card__links">
+              <a href={`/projects/${project.slug}/`}>→ readme</a>
+              {project.links.map((link) => (
+                <a href={link.href}>↗ {link.label.toLowerCase()}</a>
+              ))}
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </DocShell>
 </BaseLayout>

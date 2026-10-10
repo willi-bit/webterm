@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  /** Right-aligned label in the top border. */
+  meta?: string | undefined;
+  glyph?: string | undefined;
+  tag?: "section" | "article" | "aside" | "nav" | "div";
+  class?: string;
+  id?: string;
+  /** Accessible name; defaults to the title. */
+  label?: string;
+}
+
+const { title, meta, glyph, tag: Tag = "section", class: className, id, label } = Astro.props;
+
+// A TUI panel (btop/lazygit style): rounded border with the title set into
+// the top edge. The terminal draws the same shape with box-drawing
+// characters, so HTML and shell output read as one interface.
+---
+
+<Tag class:list={["panel", className]} id={id} aria-label={label ?? title}>
+  <header class="panel__title" aria-hidden="true">
+    <span class="panel__label">
+      {glyph && <span class="panel__glyph">{glyph}</span>}
+      {title}
+    </span>
+    {meta && <span class="panel__meta">{meta}</span>}
+  </header>
+  <slot />
+</Tag>

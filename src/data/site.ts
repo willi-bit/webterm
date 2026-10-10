@@ -8,10 +8,15 @@ export interface SkillGroup {
   items: string[];
 }
 
+/** Year-month, e.g. "2023-11". Periods without an end are ongoing. */
+export type YearMonth = `${number}-${number}`;
+
 export interface EducationItem {
   institution: string;
   degree: string;
-  period: string;
+  grade?: string;
+  start: YearMonth;
+  end?: YearMonth;
   location: string;
   details: string[];
 }
@@ -19,7 +24,8 @@ export interface EducationItem {
 export interface ExperienceItem {
   company: string;
   role: string;
-  period: string;
+  start: YearMonth;
+  end?: YearMonth;
   summary: string;
   highlights: string[];
 }
@@ -44,7 +50,20 @@ export const profile = {
     "I especially enjoy turning a concrete day-to-day problem into a robust application: understanding the requirements, shaping the technical approach, implementing it incrementally, and improving it until it works reliably in daily use.",
     "Born with one hand, I learned early to solve technical and ergonomic constraints pragmatically. I automate workflows, adapt tools, and shape working methods so they function reliably.",
   ],
-  email: "hello@example.com",
+  /** The short stack line in the terminal's welcome screen. */
+  stack: ["TypeScript", "Java", "Spring Boot", "React", "Next.js"],
+  /**
+   * Public email address. Unset hides it everywhere: contact page, CV page,
+   * footer, home panel, and the terminal (`mail` disappears too).
+   * Restore with: email: "hello@example.com",
+   */
+  email: undefined as string | undefined,
+  /**
+   * Profile photo under public/. Unset hides it on the about page, the home
+   * panel, and the terminal's neofetch portrait.
+   * Restore with: photo: "/images/willi-bittorf.jpg",
+   */
+  photo: undefined as string | undefined,
   socials: [
     { label: "GitHub", href: "https://github.com/willi-bit" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/willi-bittorf" },
@@ -86,8 +105,10 @@ export const skillGroups: SkillGroup[] = [
 export const education: EducationItem[] = [
   {
     institution: "Leipzig University",
-    degree: "Bachelor of Science in Computer Science · Final grade: 2.6",
-    period: "Oct 2021 — Jul 2026",
+    degree: "Bachelor of Science in Computer Science",
+    grade: "2.6",
+    start: "2021-10",
+    end: "2026-07",
     location: "Leipzig, Germany",
     details: [
       "Parallel Processing",
@@ -103,7 +124,7 @@ export const experience: ExperienceItem[] = [
   {
     company: "adesso SE",
     role: "Working Student, Software Engineering",
-    period: "Nov 2023 — Present",
+    start: "2023-11",
     summary:
       "Developing internal applications and automation across the frontend and backend.",
     highlights: [
@@ -116,7 +137,8 @@ export const experience: ExperienceItem[] = [
   {
     company: "vub | Wissen mit System",
     role: "Data Management Team Lead",
-    period: "Oct 2022 — Nov 2023",
+    start: "2022-10",
+    end: "2023-11",
     summary:
       "Led a student data management team responsible for most internal data systems.",
     highlights: [
@@ -127,7 +149,8 @@ export const experience: ExperienceItem[] = [
   {
     company: "vub | Wissen mit System",
     role: "Working Student, Software Engineering",
-    period: "Jun 2022 — Oct 2022",
+    start: "2022-06",
+    end: "2022-10",
     summary:
       "Developed backend functionality for the company's core enterprise knowledge management system.",
     highlights: [
@@ -144,8 +167,8 @@ export const projects: Project[] = [
     summary:
       "A terminal-inspired personal site that remains usable as a conventional portfolio.",
     description:
-      "Built as a static Astro site with an interactive React command interface and prepared for Cloudflare Workers Static Assets.",
-    technologies: ["Astro", "React", "TypeScript", "Cloudflare Workers"],
+      "A static Astro site whose home page is a real terminal emulator (xterm.js) running a small hand-written shell: line editing, history, fish-style autosuggestions, context-aware tab completion, clickable output, a virtual filesystem, and switchable color themes. Every page also exists as a plain, indexable document, deployed on Cloudflare Workers Static Assets.",
+    technologies: ["Astro", "xterm.js", "React", "TypeScript", "Cloudflare Workers"],
     links: [
       { label: "GitHub", href: "https://github.com/willi-bit/webterm" },
     ],

@@ -1,99 +1,168 @@
 ---
 import { navigation, profile } from "../data/site";
+import { defaultTheme, themeStylesheet, themes } from "../lib/themes";
 import "../styles/global.css";
 
 interface Props {
   title?: string;
   description?: string;
-  /** Bare pages render no site header — the content is the whole experience. */
-  bare?: boolean;
-  /**
-   * Content column width, like choosing a paper size: prose pages read best
-   * narrow, indexes and logs get more room, the CV is a full sheet.
-   */
-  width?: "narrow" | "medium" | "sheet";
+  /** The home page is a full-viewport desktop; documents scroll. */
+  home?: boolean;
 }
 
-const {
-  title,
-  description = profile.introduction,
-  bare = false,
-  width,
-} = Astro.props;
+const { title, description = profile.introduction, home = false } = Astro.props;
 
-const documentTitle = title ? `${title} | ${profile.name}` : `${profile.name} | ${profile.role}`;
+const documentTitle = title ? `${title} · ${profile.name}` : `${profile.name} — ${profile.role}`;
 const currentPath = Astro.url.pathname;
-const isCurrentRoute = (href: string) =>
-  href === "/" ? currentPath === href : currentPath.startsWith(href);
+const isCurrent = (href: string) =>
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+const workspaces = navigation.map((item, index) => ({
+  ...item,
+  number: index + 1,
+  name: item.href === "/" ? "~" : item.label.toLowerCase(),
+}));
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#0a0a12" />
+    <meta name="theme-color" content={defaultTheme.bg} />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/fonts/jetbrains-mono-wght.woff2" as="font" type="font/woff2" crossorigin />
     <title>{documentTitle}</title>
+    <style is:inline set:html={themeStylesheet()} />
+    {/* Apply the saved theme before first paint — no flash of the default. */}
+    <script is:inline>
+      (function () {
+        try {
+          var root = document.documentElement;
+          var theme = localStorage.getItem("wsh:theme");
+          var crt = localStorage.getItem("wsh:crt");
+          if (theme) root.dataset.theme = theme;
+          if (crt) root.dataset.crt = crt;
+        } catch (error) {}
+      })();
+    </script>
   </head>
-  <body class:list={[width && `page-width--${width}`]}>
+  <body class:list={[home ? "layout-home" : "layout-document"]}>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
-    {
-      !bare && (
-        <header class="site-header">
-          <a class="site-identity" href="/">
-            <img src="/icons/favicon-32.png" width="32" height="32" alt="" />
-            <span>{profile.name}</span>
-          </a>
-          <nav aria-label="Primary navigation">
-            <ul class="site-navigation">
-              {navigation.map((item) => (
+    <div class="topbar-wrap">
+      <header class="topbar">
+        <a class="topbar__brand" href="/" aria-label={`${profile.name} — home`}>
+          <span class="topbar__logo" aria-hidden="true">&gt;_</span>
+          <span class="topbar__name">willibit</span>
+        </a>
+
+        <nav class="topbar__nav" aria-label="Primary navigation">
+          <ol class="workspaces">
+            {
+              workspaces.map((item) => (
                 <li>
-                  <a
-                    href={item.href}
-                    aria-current={isCurrentRoute(item.href) ? "page" : undefined}
-                  >
-                    {item.label}
+                  <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+                    <span class="workspaces__number" aria-hidden="true">
+                      {item.number}
+                    </span>
+                    <span class="workspaces__name">{item.name}</span>
+                    {item.href === "/" && <span class="visually-hidden">home</span>}
                   </a>
                 </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
-      )
-    }
+              ))
+            }
+          </ol>
+        </nav>
 
-    <main id="main-content" class:list={["site-main", { "site-main--bare": bare }]}>
+        <div class="topbar__right">
+          <label class="theme-picker">
+            <span class="theme-picker__swatch" aria-hidden="true"></span>
+            <span class="visually-hidden">Color theme</span>
+            <select data-theme-picker>
+              {themes.map((theme) => <option value={theme.id}>{theme.label}</option>)}
+            </select>
+          </label>
+          <span class="topbar__clock" data-clock title="Local time in Leipzig">
+            <span class="topbar__clock-city">leipzig</span>
+            <time data-clock-time>--:--</time>
+          </span>
+        </div>
+      </header>
+    </div>
+
+    <main id="main-content" class:list={["desktop", home ? "desktop--home" : "desktop--document"]}>
       <slot />
     </main>
 
     {
-      !bare && (
+      !home && (
         <footer class="site-footer">
           <p>
             © {new Date().getFullYear()} {profile.name} · {profile.location}
           </p>
           <ul>
-            <li>
-              <a href={`mailto:${profile.email}`}>Email</a>
-            </li>
+            {profile.email && (
+              <li>
+                <a href={`mailto:${profile.email}`}>email</a>
+              </li>
+            )}
             {profile.socials.map((link) => (
               <li>
                 <a href={link.href} rel="me">
-                  {link.label}
+                  {link.label.toLowerCase()}
                 </a>
               </li>
             ))}
+            <li>
+              <a href="/?run=help">terminal</a>
+            </li>
           </ul>
         </footer>
       )
     }
+
+    <script>
+      import { THEME_EVENT, currentTheme, setDocumentTheme } from "../lib/theme-client";
+      import { findTheme } from "../lib/themes";
+
+      // Theme picker: reflects the current theme, follows changes from the shell.
+      const picker = document.querySelector<HTMLSelectElement>("[data-theme-picker]");
+      const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+      const sync = () => {
+        const theme = currentTheme();
+        if (picker) picker.value = theme.id;
+        themeColor?.setAttribute("content", theme.bg);
+      };
+      sync();
+      picker?.addEventListener("change", () => {
+        const theme = findTheme(picker.value);
+        if (theme) setDocumentTheme(theme);
+      });
+      window.addEventListener(THEME_EVENT, sync);
+
+      // Clock: local time in Leipzig, like a status bar.
+      const clock = document.querySelector<HTMLTimeElement>("[data-clock-time]");
+      const format = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Europe/Berlin",
+      });
+      const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "Europe/Berlin" });
+      const tick = () => {
+        if (!clock) return;
+        const now = new Date();
+        clock.textContent = `${weekday.format(now).toLowerCase()} ${format.format(now)}`;
+        clock.dateTime = now.toISOString();
+      };
+      tick();
+      window.setInterval(tick, 15_000);
+    </script>
   </body>
 </html>

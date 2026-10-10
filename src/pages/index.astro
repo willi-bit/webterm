@@ -1,27 +1,171 @@
 ---
-import Terminal from "../components/Terminal";
-import { navigation } from "../data/site";
+import Panel from "../components/Panel.astro";
+import Shell from "../components/Shell";
+import { education, experience, navigation, profile, projects } from "../data/site";
+import { formatMonth } from "../lib/dates";
+import { shortHash } from "../lib/shell/render";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const current = experience.find((item) => !item.end);
+const degree = education[0];
+const handle = (href: string) => href.replace(/^https?:\/\/(www\.)?/, "");
 ---
 
-<BaseLayout bare>
-  <Terminal client:load />
+<BaseLayout home>
+  <h1 class="visually-hidden">{profile.name} — {profile.role}</h1>
 
-  <noscript>
-    <p>
-      The interactive terminal requires JavaScript. The portfolio is also
-      available as plain pages:
-    </p>
-    <ul>
-      {
-        navigation
-          .filter((item) => item.href !== "/")
-          .map((item) => (
-            <li>
-              <a href={item.href}>{item.label}</a>
-            </li>
-          ))
-      }
-    </ul>
-  </noscript>
+  <div class="home-grid">
+    <Shell client:load />
+
+    <noscript>
+      <div class="panel noscript-panel">
+        <p>The interactive terminal needs JavaScript. Everything is also available as plain pages:</p>
+        <ul>
+          {
+            navigation
+              .filter((item) => item.href !== "/")
+              .map((item) => (
+                <li>
+                  <a href={item.href}>{item.label}</a>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+    </noscript>
+
+    <aside class="home-side" aria-label="At a glance">
+      <Panel title="profile" glyph="◆" class="panel--profile">
+        <div class:list={["profile", { "profile--no-photo": !profile.photo }]}>
+          {
+            profile.photo && (
+              <img
+                class="profile__photo"
+                src={profile.photo}
+                width="300"
+                height="300"
+                alt={`Portrait of ${profile.name}`}
+              />
+            )
+          }
+          <div class="profile__id">
+            <h2 class="profile__name">{profile.name}</h2>
+            <p class="profile__role">{profile.role}</p>
+            <p class="profile__place">{profile.location}</p>
+          </div>
+        </div>
+        <dl class="facts">
+          {
+            current && (
+              <div>
+                <dt>now</dt>
+                <dd>
+                  {current.company} <span>· working student</span>
+                </dd>
+              </div>
+            )
+          }
+          {
+            degree && (
+              <div>
+                <dt>studied</dt>
+                <dd>
+                  B.Sc. CS <span>· {degree.institution}</span>
+                </dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>stack</dt>
+            <dd>{profile.stack.slice(0, 4).join(" · ")}</dd>
+          </div>
+        </dl>
+        <p class="keys">
+          <a class="key key--primary" href="/cv.pdf" download>↓ cv.pdf</a>
+          {profile.email && <a class="key" href={`mailto:${profile.email}`}>email</a>}
+          {
+            profile.socials.map((social) => (
+              <a class="key" href={social.href} rel="me" title={handle(social.href)}>
+                {social.label.toLowerCase()} ↗
+              </a>
+            ))
+          }
+        </p>
+      </Panel>
+
+      <Panel title="git log --graph" glyph={"\ue0a0"} meta="career" class="panel--log">
+        <ol class="gitlog">
+          {
+            experience.map((item) => (
+              <li>
+                <a href="/experience/" data-run="experience">
+                  <span class:list={["gitlog__dot", { "gitlog__dot--head": !item.end }]} aria-hidden="true" />
+                  <span class="gitlog__line">
+                    <span class="gitlog__hash">{shortHash(`${item.company}${item.start}`)}</span>
+                    {!item.end && <span class="gitlog__ref">HEAD</span>}
+                    <span class="gitlog__date">{formatMonth(item.start)}</span>
+                  </span>
+                  <span class="gitlog__msg">
+                    {item.role} <span>@ {item.company}</span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+          {
+            degree && (
+              <li>
+                <a href="/about/#education" data-run="education">
+                  <span class="gitlog__dot gitlog__dot--tag" aria-hidden="true" />
+                  <span class="gitlog__line">
+                    <span class="gitlog__hash">{shortHash(degree.institution)}</span>
+                    <span class="gitlog__ref gitlog__ref--tag">tag: b.sc.</span>
+                    <span class="gitlog__date">{formatMonth(degree.start)}</span>
+                  </span>
+                  <span class="gitlog__msg">
+                    Computer Science <span>@ {degree.institution}</span>
+                  </span>
+                </a>
+              </li>
+            )
+          }
+        </ol>
+      </Panel>
+
+      <Panel title="projects" glyph="⊞" meta={`${projects.length}`} class="panel--projects">
+        <ul class="mini-projects">
+          {
+            projects.map((project) => (
+              <li>
+                <a href={`/projects/${project.slug}/`} data-run={`project ${project.slug}`}>
+                  <span class="mini-projects__title">{project.title}</span>
+                  <span class="mini-projects__summary">{project.summary}</span>
+                  <span class="mini-projects__tags">{project.technologies.slice(0, 3).join(" · ")}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </Panel>
+    </aside>
+  </div>
 </BaseLayout>
+
+<script>
+  import { RUN_EVENT } from "../lib/theme-client";
+
+  // Side panels drive the terminal once it's running; until then (or with
+  // a modifier key) they're ordinary links.
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+    const target = (event.target as Element | null)?.closest<HTMLElement>("[data-run]");
+    const command = target?.dataset.run;
+    if (!command || !document.querySelector(".shell__viewport[data-ready]")) {
+      return;
+    }
+    event.preventDefault();
+    window.dispatchEvent(new CustomEvent(RUN_EVENT, { detail: command }));
+  });
+</script>

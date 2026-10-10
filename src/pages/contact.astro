@@ -1,48 +1,100 @@
 ---
+import DocShell from "../components/DocShell.astro";
 import { profile } from "../data/site";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const socials = profile.socials.map((link) => ({
-  ...link,
-  text: link.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""),
-}));
+const socialNames = profile.socials.map((link) => link.label).join(" or ");
+const channels = [
+  ...(profile.email
+    ? [{ label: "email", href: `mailto:${profile.email}`, text: profile.email, rel: undefined }]
+    : []),
+  ...profile.socials.map((link) => ({
+    label: link.label.toLowerCase(),
+    href: link.href,
+    text: link.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""),
+    rel: "me",
+  })),
+];
 ---
 
-<BaseLayout title="Contact" width="narrow">
-  <header class="page-heading">
-    <p class="page-eyebrow">mail --compose</p>
-    <h1>Contact</h1>
-    <p class="page-lede">
-      Email is the fastest way to reach me — one tap, no form:
-    </p>
-  </header>
+<BaseLayout title="Contact" description={`Get in touch with ${profile.name}.`}>
+  <DocShell file="contact.sh" command="./contact.sh" filetype="sh">
+    <h1 class="doc-title">Contact</h1>
+    {
+      profile.email ? (
+        <>
+          <p class="lede">Email is the fastest way to reach me — one tap, no form.</p>
+          <div class="mail-hero">
+            <a class="mail-hero__address" href={`mailto:${profile.email}`}>{profile.email}</a>
+            <button class="key" type="button" data-copy={profile.email} hidden>copy</button>
+          </div>
+        </>
+      ) : (
+        <p class="lede">The best way to reach me is {socialNames}.</p>
+      )
+    }
 
-  <p class="contact-hero">
-    <a href={`mailto:${profile.email}`}>{profile.email}</a>
-  </p>
-
-  <section aria-labelledby="elsewhere-heading">
-    <h2 id="elsewhere-heading">Elsewhere</h2>
-    <ul class="link-list">
+    <h2 id="channels">Channels</h2>
+    <ul class="link-rows">
       {
-        socials.map((link) => (
+        channels.map((channel) => (
           <li>
-            <a href={link.href} rel="me">
-              {link.label} ↗
+            <a href={channel.href} rel={channel.rel}>
+              <span class="link-rows__label">{channel.label}</span>
+              <span class="link-rows__value">
+                {channel.text}
+                {channel.label !== "email" && " ↗"}
+              </span>
             </a>
-            <span class="muted">{link.text}</span>
           </li>
         ))
       }
       <li>
-        <span>Location</span>
-        <span class="muted">{profile.location}</span>
+        <span class="link-rows__row">
+          <span class="link-rows__label">location</span>
+          <span class="link-rows__value">
+            {profile.location}<span class="link-rows__time" data-local-time></span>
+          </span>
+        </span>
       </li>
     </ul>
-  </section>
 
-  <p class="muted">
-    Prefer the terminal? <a href="/?run=contact">Run <code>contact</code> on the
-    home page</a> — it has a form.
-  </p>
+    <p class="callout">
+      <span class="callout__prompt" aria-hidden="true">❯</span>
+      {
+        profile.email ? (
+          <span>
+            Prefer the terminal? <a href="/?run=mail">Run <code>mail</code> on the home page</a> to
+            write me right from the shell.
+          </span>
+        ) : (
+          <span>
+            Prefer the terminal? <a href="/?run=contact">Run <code>contact</code> on the home page</a>.
+          </span>
+        )
+      }
+    </p>
+  </DocShell>
 </BaseLayout>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>("[data-copy]");
+  if (button && navigator.clipboard) {
+    button.hidden = false;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        button.textContent = "✓ copied";
+      } catch {
+        button.textContent = "copy failed";
+      }
+      window.setTimeout(() => (button.textContent = "copy"), 1800);
+    });
+  }
+
+  const time = document.querySelector("[data-local-time]");
+  if (time) {
+    const format = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" });
+    time.textContent = ` · ${format.format(new Date())} local time`;
+  }
+</script>
