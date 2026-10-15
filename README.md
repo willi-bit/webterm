@@ -154,6 +154,13 @@ npm run cf:deploy
 Before the first deployment, update `name` in `wrangler.jsonc` if
 `webterm-portfolio` is not the desired Cloudflare Worker name.
 
+Pushes to `main` deploy automatically through Cloudflare Workers Builds (the
+Git integration configured in the Cloudflare dashboard under the Worker's
+Settings → Builds). There is no GitHub Actions workflow, and `npm run cf:deploy`
+is only needed for one-off manual deploys. Build and deploy logs are in the
+dashboard. Don't also add a GitHub
+Actions deploy, or every push will deploy twice.
+
 If server-rendered routes, D1, KV, or other bindings are added later, install
 Astro's Cloudflare adapter at that point (`npx astro add cloudflare`). Do not
 add it solely for the current static site.
