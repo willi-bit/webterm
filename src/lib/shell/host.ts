@@ -733,15 +733,6 @@ export class ShellHost {
         void this.flush().then(() => window.setTimeout(() => window.location.assign(href), 320));
       },
       openUrl: (href) => this.openUrl(href),
-      download: (blob, filename) => {
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = filename;
-        anchor.click();
-        window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
-      },
-      fetch: (href) => window.fetch(href, { signal }),
       copy: async (text) => {
         try {
           await navigator.clipboard.writeText(text);
@@ -1129,9 +1120,6 @@ export class ShellHost {
     if (uri.startsWith("cmd:")) {
       return `run ${decodeURIComponent(uri.slice(4))}`;
     }
-    if (uri.startsWith("dl:")) {
-      return `download ${uri.slice(3).replace(/^\//, "")}`;
-    }
     if (uri.startsWith("mailto:")) {
       return `email ${uri.slice(7)}`;
     }
@@ -1144,13 +1132,6 @@ export class ShellHost {
   private activateLink(uri: string): void {
     if (uri.startsWith("cmd:")) {
       this.runCommand(decodeURIComponent(uri.slice(4)));
-      return;
-    }
-    if (uri.startsWith("dl:")) {
-      const anchor = document.createElement("a");
-      anchor.href = uri.slice(3);
-      anchor.download = uri.slice(3).split("/").pop() ?? "";
-      anchor.click();
       return;
     }
     this.openUrl(uri);

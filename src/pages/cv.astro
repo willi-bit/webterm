@@ -15,10 +15,8 @@ const socials = profile.socials.map((link) => ({
   <div class="viewer">
     <Panel tag="section" title="zathura — cv.pdf" glyph="◫" meta="1/1" class="panel--viewer" label="CV viewer">
       <div class="viewer__toolbar">
-        <a class="key key--primary" href="/cv.pdf" download>↓ download pdf</a>
-        <a class="key" href="/cv.pdf">open pdf</a>
-        <button class="key" type="button" data-print>print</button>
-        <span class="viewer__hint">or in the terminal: <a href="/?run=wget%20cv.pdf">wget cv.pdf</a></span>
+        <button class="key key--primary" type="button" data-print>print</button>
+        <span class="viewer__hint">or in the terminal: <a href="/?run=cv">cv</a></span>
       </div>
 
       <div class="viewer__canvas">

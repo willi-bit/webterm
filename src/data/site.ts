@@ -55,13 +55,11 @@ export const profile = {
   /**
    * Public email address. Unset hides it everywhere: contact page, CV page,
    * footer, home panel, and the terminal (`mail` disappears too).
-   * Restore with: email: "hello@example.com",
    */
   email: undefined as string | undefined,
   /**
-   * Profile photo under public/. Unset hides it on the about page, the home
-   * panel, and the terminal's neofetch portrait.
-   * Restore with: photo: "/images/willi-bittorf.jpg",
+   * Profile photo under public/, e.g. "/images/me.jpg". Unset hides it on the
+   * about page, the home panel, and the terminal's neofetch portrait.
    */
   photo: undefined as string | undefined,
   socials: [

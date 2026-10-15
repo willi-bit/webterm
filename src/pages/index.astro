@@ -81,7 +81,7 @@ const handle = (href: string) => href.replace(/^https?:\/\/(www\.)?/, "");
           </div>
         </dl>
         <p class="keys">
-          <a class="key key--primary" href="/cv.pdf" download>↓ cv.pdf</a>
+          <a class="key key--primary" href="/cv/">cv</a>
           {profile.email && <a class="key" href={`mailto:${profile.email}`}>email</a>}
           {
             profile.socials.map((social) => (

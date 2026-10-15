@@ -44,8 +44,7 @@ How the pieces fit:
   when the window is resized or the theme changes, so boxes, wrapping, and
   colors are always right.
 - **Everything is clickable.** Commands, files, and links in the output are
-  OSC 8 hyperlinks: `cmd:` runs a command, `dl:` downloads, `http(s):` and
-  `mailto:` open. The function bar under the terminal and the side panels
+  OSC 8 hyperlinks: `cmd:` runs a command, `http(s):` and `mailto:` open. The function bar under the terminal and the side panels
   (profile, career `git log`, projects) run commands too, so nobody has to type.
 - **Startup.** The first visit in a session plays a short boot log and types
   `neofetch`; later visits start instantly. Reduced-motion visitors never see
@@ -63,8 +62,7 @@ off to the visitor's mail client; only present while an email is
 configured), `neofetch`.
 
 System: `ls [-la]`, `cd` (incl. `cd -` and auto-cd), `cat`, `tree`, `pwd`,
-`open <page|file|url>`, `wget cv.pdf` (a real streamed download), `theme
-[name]`, `crt [on|off]`, `history`, `clear`, `copy`, `echo`, `env`, `date`,
+`open <page|file|url>`, `theme [name]`, `crt [on|off]`, `history`, `clear`, `copy`, `echo`, `env`, `date`,
 `whoami`, `uname`, `man <command>` (try `man willi`), `exit`.
 
 Keys: Tab completes, ↑/↓ walk the history (prefix-filtered), → accepts the

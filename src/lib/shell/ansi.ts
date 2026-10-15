@@ -46,7 +46,7 @@ export function badge(text: string, background: string, foreground: string): str
 
 /**
  * OSC 8 hyperlink. The terminal's link handler decides what each scheme
- * does: http(s) opens a tab, `cmd:` runs a shell command, `dl:` downloads.
+ * does: http(s) opens a tab, `cmd:` runs a shell command.
  */
 export function link(uri: string, text: string): string {
   return `${OSC}8;;${uri}${BEL}${text}${OSC}8;;${BEL}`;

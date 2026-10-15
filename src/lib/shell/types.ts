@@ -81,8 +81,6 @@ export interface ShellIO {
   setCrt(on: boolean): void;
   navigate(href: string): void;
   openUrl(href: string): void;
-  download(blob: Blob, filename: string): void;
-  fetch(href: string): Promise<Response>;
   copy(text: string): Promise<boolean>;
   exit(): void;
 }

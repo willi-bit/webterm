@@ -565,22 +565,11 @@ export const cvCard: Renderable = (context) => {
       ...box(content, {
         width: cardWidth,
         title: p.bold(p.accent("cv.pdf")),
-        meta: p.faint("149 KB · PDF"),
         footer: p.faint(`updated ${now.getFullYear()}`),
         border: theme.borderStrong,
       }),
       "",
-      ...flow(
-        [
-          button(context, "dl:/cv.pdf", "↓ download", true),
-          button(context, "/cv.pdf", "open pdf"),
-          button(context, "/cv/", "cv page"),
-        ],
-        cardWidth,
-        "  ",
-      ),
-      "",
-      `${p.faint("or the classic way:")} ${p.cmd("wget cv.pdf")}`,
+      button(context, "/cv/", "open the full cv", true),
     ]),
   ];
 };

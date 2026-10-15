@@ -97,8 +97,6 @@ function createIO(options: { cols?: number; answers?: (string | null)[] } = {}) 
       state.navigated = href;
     },
     openUrl: (href) => state.opened.push(href),
-    download: () => undefined,
-    fetch: () => Promise.reject(new Error("offline")),
     copy: async () => true,
     exit: () => {
       state.exited = true;
@@ -314,7 +312,7 @@ describe("commands", () => {
   it("opens pages, profiles, and documents", async () => {
     expect((await run("open about")).state.navigated).toBe("/about/");
     expect((await run("open github")).state.opened[0]).toContain("github.com");
-    expect((await run("open cv.pdf")).state.opened[0]).toBe("/cv.pdf");
+    expect((await run("open cv.pdf")).state.navigated).toBe("/cv/");
     expect((await run("open nowhere")).status).toBe(1);
   });
 

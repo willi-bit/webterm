@@ -17,8 +17,8 @@ export type VNode =
   | { kind: "file"; name: string; read: () => string }
   /** Executable: running it (`./contact.sh`) runs `command`. */
   | { kind: "exec"; name: string; command: string }
-  /** Binary document: `cat` refuses, `open` opens `href`. */
-  | { kind: "doc"; name: string; href: string; size: number; command: string };
+  /** Document with its own page: `cat` refuses, `open` navigates to `href`. */
+  | { kind: "doc"; name: string; href: string; command: string };
 
 export const HOME = "/home/visitor";
 
@@ -101,8 +101,7 @@ const homeDirectory: VNode = {
     {
       kind: "doc",
       name: "cv.pdf",
-      href: "/cv.pdf",
-      size: 152_156,
+      href: "/cv/",
       command: "cv",
     },
     {
@@ -207,11 +206,10 @@ export function isHidden(node: VNode): boolean {
 export function nodeSize(node: VNode): number {
   switch (node.kind) {
     case "dir":
+    case "doc":
       return 4096;
     case "exec":
       return 512;
-    case "doc":
-      return node.size;
     case "file":
       return new TextEncoder().encode(node.read()).length;
   }

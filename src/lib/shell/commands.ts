@@ -1,6 +1,6 @@
 import { profile, projects } from "../../data/site";
 import { findTheme, themes } from "../themes";
-import { flow, padEnd, padStart, truncate } from "./ansi";
+import { flow, padStart, truncate } from "./ansi";
 import {
   about,
   contactCard,
@@ -357,7 +357,7 @@ function open(io: ShellIO, args: string[]): number {
   const node = lookup(resolvePath(io.cwd, target));
   if (node?.kind === "doc") {
     io.print(message("ok", `→ opening ${node.href}`));
-    io.openUrl(node.href);
+    io.navigate(node.href);
     return 0;
   }
   if (node?.kind === "file" || node?.kind === "exec") {
@@ -441,89 +441,6 @@ async function mail(io: ShellIO, to: string): Promise<number> {
   return 0;
 }
 
-async function wget(io: ShellIO, args: string[]): Promise<number> {
-  const target = args.find((arg) => !arg.startsWith("-")) ?? "cv.pdf";
-  const node = lookup(resolvePath(io.cwd, target.replace(/^https?:\/\/[^/]+\//, "")));
-  if (node?.kind !== "doc") {
-    io.print(message("error", `wget: ${target}: only cv.pdf is downloadable here`));
-    return 8;
-  }
-
-  const started = new Date();
-  const stamp = (date: Date) => date.toISOString().slice(0, 19).replace("T", " ");
-  const origin = globalThis.location?.origin ?? "https://willibit.com";
-  const host = origin.replace(/^https?:\/\//, "");
-  io.print(
-    lines((context) => [
-      context.p.muted(`--${stamp(started)}--  ${origin}${node.href}`),
-      context.p.muted(`Resolving ${host}... connected.`),
-      context.p.muted("HTTP request sent, awaiting response... ") + context.p.green("200 OK"),
-    ]),
-  );
-
-  let response: Response;
-  try {
-    response = await io.fetch(node.href);
-    if (!response.ok || !response.body) {
-      throw new Error(String(response.status));
-    }
-  } catch {
-    io.print(message("error", "wget: connection failed — try the download button in `cv` instead"));
-    return 4;
-  }
-
-  const total = Number(response.headers.get("content-length")) || node.size;
-  io.print(
-    lines((context) => [
-      context.p.muted(`Length: ${total} (${Math.round(total / 1024)}K) [application/pdf]`),
-      context.p.muted(`Saving to: ‘${node.name}’`),
-      "",
-    ]),
-  );
-
-  const line = io.live();
-  const bar = (received: number, cols: number, done: boolean) => {
-    const percent = Math.min(100, Math.round((received / total) * 100));
-    const barWidth = Math.max(10, Math.min(40, cols - 40));
-    const filled = Math.round((percent / 100) * barWidth);
-    const arrow = done ? "=" : ">";
-    const track = `${"=".repeat(Math.max(0, filled - 1))}${filled > 0 ? arrow : ""}${" ".repeat(barWidth - filled)}`;
-    return ` ${padEnd(node.name, 10)} ${padStart(String(percent), 3)}%[${track}] ${padStart(`${(received / 1024).toFixed(1)}K`, 8)}`;
-  };
-
-  const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let received = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done || io.signal.aborted) {
-      break;
-    }
-    chunks.push(value);
-    received += value.length;
-    line.update(bar(received, io.cols, false));
-    await io.sleep(40);
-  }
-  if (io.signal.aborted) {
-    void reader.cancel();
-    line.done(() => []);
-    return 130;
-  }
-  const seconds = Math.max(0.1, (Date.now() - started.getTime()) / 1000);
-  line.done((context) => [context.p.accent(bar(received, context.cols, true)) + context.p.faint(`  in ${seconds.toFixed(1)}s`)]);
-
-  io.download(new Blob(chunks as BlobPart[], { type: "application/pdf" }), node.name);
-  const finished = stamp(new Date());
-  io.print(
-    lines((context) => [
-      "",
-      context.p.muted(`${finished} (${Math.round(received / 1024 / seconds)} KB/s) - `) +
-        context.p.green(`‘${node.name}’ saved [${received}/${total}]`),
-    ]),
-  );
-  return 0;
-}
-
 const portfolioCommands: Command[] = [
   {
     name: "about",
@@ -588,7 +505,7 @@ const portfolioCommands: Command[] = [
     name: "cv",
     aliases: ["resume"],
     group: "portfolio",
-    summary: "résumé — preview and download",
+    summary: "résumé at a glance",
     run: (_, io) => io.print(cvCard),
   },
   {
@@ -696,15 +613,6 @@ const systemCommands: Command[] = [
       return [...named, ...completePath(context.cwd, args.at(-1) ?? "")];
     },
     run: (args, io) => open(io, args),
-  },
-  {
-    name: "wget",
-    aliases: ["curl", "download"],
-    group: "system",
-    usage: "wget cv.pdf",
-    summary: "download the CV, the old-fashioned way",
-    complete: pathArgument((node) => node.kind === "doc"),
-    run: (args, io) => wget(io, args),
   },
   {
     name: "theme",
